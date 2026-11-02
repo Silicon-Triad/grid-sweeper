@@ -1,7 +1,7 @@
 # Project Plan — CS-323 AI CEP: Intelligent Vacuum-Cleaning Robot
 
 Status: **APPROVED — 2026-11-02** (M. Ahmed Qazi)
-Repo: `<org>/cs323-cep-vacuum-robot` (private)
+Repo: `Silicon-Triad/grid-sweeper` (public)
 Source of truth: `docs/spec/` (Problem Description + Grading Rubric PDFs, frozen). The PDFs win any conflict with this plan or `docs/requirements.md`.
 Internal finish: **Mon 16 Nov 2026**. Official deadline: 22 Nov 2026 (slack).
 
