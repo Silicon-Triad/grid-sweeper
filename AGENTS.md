@@ -32,7 +32,7 @@ The PDFs win any conflict with `docs/plan.md`, `docs/requirements.md` or this fi
 Owners (plan §1): Muhammad Ahmed Qazi `@Muhammad-Ahmed-Qazi` (infra, CI,
 integration, render, notebook — C3), Mujtaba Jawaid Rao `@MujtabaJRao` (search,
 comparison — C1, C4), Huzaifa Hanif `@Huzaifa-Hanif-01` (CSP — C2), Muhammad
-Ashar Khan (username TBD) (env, generator, tests, data, report — C5).
+Ashar Khan `@MUHAMMD-ASHAR-KHAN` (env, generator, tests, data, report — C5).
 Cross-review pairs: Mujtaba ↔ Huzaifa, Qazi ↔ Ashar.
 
 ## Commands
