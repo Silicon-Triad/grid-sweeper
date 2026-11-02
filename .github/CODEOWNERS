@@ -1,20 +1,16 @@
 # Code owners per docs/plan.md §1. Last matching pattern wins.
 # Every path has at least one owner other than its likely PR author, so
-# self-authored PRs stay approvable.
-#
-# TODO(ashar): Ashar's GitHub username is not known yet. Until it is:
-#   - Ashar-only paths list @Muhammad-Ahmed-Qazi as a placeholder;
-#   - "Qazi + Ashar" paths list @MujtabaJRao as the second owner.
-# Replace those placeholders with Ashar's handle when it is available.
+# self-authored PRs stay approvable (Ashar's paths keep his cross-review
+# partner Qazi as second owner; Qazi's paths keep Mujtaba as a third owner).
 
 # Default (root config: README, pyproject, requirements, ...): Qazi + Ashar
-*                       @Muhammad-Ahmed-Qazi @MujtabaJRao
+*                       @Muhammad-Ahmed-Qazi @MUHAMMD-ASHAR-KHAN @MujtabaJRao
 
 # Ashar: env, generator, tests, data
-/src/cep/env.py         @Muhammad-Ahmed-Qazi
-/tools/gen_env.py       @Muhammad-Ahmed-Qazi
-/tests/                 @Muhammad-Ahmed-Qazi
-/data/                  @Muhammad-Ahmed-Qazi
+/src/cep/env.py         @MUHAMMD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
+/tools/gen_env.py       @MUHAMMD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
+/tests/                 @MUHAMMD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
+/data/                  @MUHAMMD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
 
 # Mujtaba: search
 /src/cep/search.py      @MujtabaJRao
@@ -23,15 +19,15 @@
 /src/cep/csp.py         @Huzaifa-Hanif-01
 
 # Qazi + Ashar: integration, render, CI, tooling, notebook
-/src/cep/integrate.py   @Muhammad-Ahmed-Qazi @MujtabaJRao
-/src/cep/render.py      @Muhammad-Ahmed-Qazi @MujtabaJRao
-/.github/               @Muhammad-Ahmed-Qazi @MujtabaJRao
-/tools/                 @Muhammad-Ahmed-Qazi @MujtabaJRao
-/tools/gen_env.py       @Muhammad-Ahmed-Qazi
-/notebook/              @Muhammad-Ahmed-Qazi @MujtabaJRao
+/src/cep/integrate.py   @Muhammad-Ahmed-Qazi @MUHAMMD-ASHAR-KHAN @MujtabaJRao
+/src/cep/render.py      @Muhammad-Ahmed-Qazi @MUHAMMD-ASHAR-KHAN @MujtabaJRao
+/.github/               @Muhammad-Ahmed-Qazi @MUHAMMD-ASHAR-KHAN @MujtabaJRao
+/tools/                 @Muhammad-Ahmed-Qazi @MUHAMMD-ASHAR-KHAN @MujtabaJRao
+/tools/gen_env.py       @MUHAMMD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
+/notebook/              @Muhammad-Ahmed-Qazi @MUHAMMD-ASHAR-KHAN @MujtabaJRao
 
 # Report: Ashar (assembler) + Qazi
-/report/                @Muhammad-Ahmed-Qazi
+/report/                @MUHAMMD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
 
 # Qazi + Mujtaba: docs and rulebook
 /docs/                  @Muhammad-Ahmed-Qazi @MujtabaJRao

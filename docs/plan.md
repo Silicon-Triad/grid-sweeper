@@ -1,6 +1,6 @@
 # Project Plan — CS-323 AI CEP: Intelligent Vacuum-Cleaning Robot
 
-Status: **DRAFT — awaiting approval** (M. Ahmed Qazi)
+Status: **APPROVED — 2026-11-02** (M. Ahmed Qazi)
 Repo: `<org>/cs323-cep-vacuum-robot` (private)
 Source of truth: `docs/spec/` (Problem Description + Grading Rubric PDFs, frozen). The PDFs win any conflict with this plan or `docs/requirements.md`.
 Internal finish: **Mon 16 Nov 2026**. Official deadline: 22 Nov 2026 (slack).
@@ -11,10 +11,10 @@ Internal finish: **Mon 16 Nov 2026**. Official deadline: 22 Nov 2026 (slack).
 
 | Member | Roll no. | GitHub | Owns | Rubric |
 |---|---|---|---|---|
-| Muhammad Ahmed Qazi | CS-24045 | `@<qazi>` | infra, CI, `integrate.py`, `render.py`, notebook build + consolidation | C3, notebook |
-| Mujtaba Jawaid Rao | CS-24047 | `@<mujtaba>` | `search.py`, algorithm comparison | C1, C4 |
-| Huzaifa Hanif | CS-24039 | `@<huzaifa>` | `csp.py` | C2 |
-| Muhammad Ashar Khan | CS-24035 | `@<ashar>` | `env.py`, `tools/gen_env.py`, `tests/`, `data/`, report | C5, verification |
+| Muhammad Ahmed Qazi | CS-24045 | `@Muhammad-Ahmed-Qazi` | infra, CI, `integrate.py`, `render.py`, notebook build + consolidation | C3, notebook |
+| Mujtaba Jawaid Rao | CS-24047 | `@MujtabaJRao` | `search.py`, algorithm comparison | C1, C4 |
+| Huzaifa Hanif | CS-24039 | `@Huzaifa-Hanif-01` | `csp.py` | C2 |
+| Muhammad Ashar Khan | CS-24035 | `@MUHAMMD-ASHAR-KHAN` | `env.py`, `tools/gen_env.py`, `tests/`, `data/`, report | C5, verification |
 
 Cross-review pairs (each person must be able to explain the other's area at the viva):
 - Mujtaba ↔ Huzaifa (search ↔ CSP)
