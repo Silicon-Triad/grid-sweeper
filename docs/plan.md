@@ -11,10 +11,10 @@ Internal finish: **Mon 16 Nov 2026**. Official deadline: 22 Nov 2026 (slack).
 
 | Member | Roll no. | GitHub | Owns | Rubric |
 |---|---|---|---|---|
-| Muhammad Ahmed Qazi | CS-24045 | `@Muhammad-Ahmed-Qazi` | infra, CI, `integrate.py`, `render.py`, notebook build + consolidation | C3, notebook |
+| Muhammad Ahmed Qazi | CS-24045 | `@Muhammad-Ahmed-Qazi` | infra, CI, `integrate.py`, `render.py`, notebook build + consolidation, schedule parser (in `env.py`), own `Environment.txt`, error files | C3, notebook |
 | Mujtaba Jawaid Rao | CS-24047 | `@MujtabaJRao` | `search.py`, algorithm comparison | C1, C4 |
 | Huzaifa Hanif | CS-24039 | `@Huzaifa-Hanif-01` | `csp.py` | C2 |
-| Muhammad Ashar Khan | CS-24035 | `@MUHAMMD-ASHAR-KHAN` | `env.py`, `tools/gen_env.py`, `tests/`, `data/`, report | C5, verification |
+| Muhammad Ashar Khan | CS-24035 | `@MUHAMMD-ASHAR-KHAN` | env parser (`env.py`), `tools/gen_env.py`, `tests/`, report | C5, verification |
 
 Cross-review pairs (each person must be able to explain the other's area at the viva):
 - Mujtaba ↔ Huzaifa (search ↔ CSP)
@@ -55,7 +55,7 @@ cs323-cep-vacuum-robot/
 │   ├── Environment_Sample.txt   Schedule_Sample.txt    # from spec
 │   └── Environment_Error.txt    Schedule_Error.txt     # failure case
 ├── src/cep/
-│   ├── env.py        # parsers, grid, validation           (Ashar)
+│   ├── env.py        # parsers, grid, validation           (Ashar: env parser; Qazi: schedule parser)
 │   ├── search.py     # successors, goal, cost, h, search   (Mujtaba)
 │   ├── csp.py        # MRV/degree, LCV, FC, backtracking   (Huzaifa)
 │   ├── integrate.py  # execute_schedule                    (Qazi)
@@ -197,12 +197,12 @@ All unassigned at creation; owner shown for assignment later. All in milestone s
 | 2 | Write `docs/requirements.md` from spec | docs | Qazi (AI draft, team approve) | all | Every spec "must" has an ID, parent §, rubric C#, verification method; 4 approvals |
 | 3 | Fix internal types: `Grid`, `Constraints`, algorithm names | env, frozen-interface | Ashar | REQ-ENV | Types documented in `env.py` docstring + AGENTS.md; reviewed by all owners |
 | 4 | Environment parser + grid | env, feature | Ashar | REQ-ENV | Parses sample; D1…Dn in file order; clean error on malformed/overlapping/out-of-bounds input |
-| 5 | Schedule parser + validation | env, feature | Ashar | REQ-CSP | Parses sample; rejects slots < tasks and unknown labels with clear message |
+| 5 | Schedule parser + validation | env, feature | Qazi | REQ-CSP | Parses sample; rejects slots < tasks and unknown labels with clear message |
 | 6 | `tools/gen_env.py` random env/schedule generator | test, feature | Ashar | REQ-TEST | Flags for size/obstacles/dirt; modes: reachable, unreachable, feasible, infeasible; seeded |
 | 7 | Test skeletons + fixtures for all modules | test | Ashar | REQ-SRCH, REQ-CSP, REQ-INT | Tests written from spec, initially xfail; fixtures for start==goal, no path, infeasible, unconstrained |
-| 8 | Own `Environment.txt` | env | Ashar | REQ-ENV | ≥8×8, ≥6 obstacles, ≥4 dirty, all reachable, no overlap, ≠ sample |
+| 8 | Own `Environment.txt` | env | Qazi | REQ-ENV | ≥8×8, ≥6 obstacles, ≥4 dirty, all reachable, no overlap, ≠ sample |
 | 9 | Own `Schedule.txt` | csp | Huzaifa | REQ-CSP | ≥3 precedence, ≥2 latest-slot, feasible, includes ≥1 unconstrained task |
-| 10 | Error files `Environment_Error.txt` / `Schedule_Error.txt` | env, test | Ashar | REQ-TEST | Triggers no-path and/or infeasible-schedule path; failure reported cleanly |
+| 10 | Error files `Environment_Error.txt` / `Schedule_Error.txt` | env, test | Qazi | REQ-TEST | Triggers no-path and/or infeasible-schedule path; failure reported cleanly |
 
 ### M1 Search (due 6 Nov)
 | # | Title | Labels | Owner | REQ | Acceptance |
@@ -247,3 +247,9 @@ All unassigned at creation; owner shown for assignment later. All in milestone s
 
 - [ ] Org name + four GitHub usernames (for CODEOWNERS)
 - [ ] Team approval of this plan
+
+---
+
+## Changelog
+
+- 2026-11-02: #5, #8, #10 reassigned Ashar → Qazi (M0 load)

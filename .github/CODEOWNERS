@@ -6,11 +6,14 @@
 # Default (root config: README, pyproject, requirements, ...): Qazi + Ashar
 *                       @Muhammad-Ahmed-Qazi @MUHAMMD-ASHAR-KHAN @MujtabaJRao
 
-# Ashar: env, generator, tests, data
+# env.py: Ashar (env parser) + Qazi (schedule parser) — each approves the other
 /src/cep/env.py         @MUHAMMD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
+
+# Ashar: generator, tests
 /tools/gen_env.py       @MUHAMMD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
 /tests/                 @MUHAMMD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
-/data/                  @MUHAMMD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
+# data/: Qazi authors own env + error files, Huzaifa own schedule; Ashar approves
+/data/                  @Muhammad-Ahmed-Qazi @MUHAMMD-ASHAR-KHAN
 
 # Mujtaba: search
 /src/cep/search.py      @MujtabaJRao
