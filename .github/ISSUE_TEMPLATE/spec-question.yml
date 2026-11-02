@@ -1,0 +1,31 @@
+name: Spec question
+description: The spec is silent or ambiguous. Never invent a value — ask here.
+labels: ["spec-question"]
+body:
+  - type: textarea
+    id: spec
+    attributes:
+      label: Spec
+      description: Quote the exact text from docs/spec/ (with §) that is silent or ambiguous.
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+    validations:
+      required: true
+  - type: textarea
+    id: options
+    attributes:
+      label: Options considered
+      description: Possible interpretations and their consequences.
+  - type: input
+    id: req
+    attributes:
+      label: REQ
+      placeholder: REQ-
+  - type: markdown
+    attributes:
+      value: |
+        Resolution: record the decision in `docs/decisions.md`, relabel `design-decision`, and never present it as a spec value.

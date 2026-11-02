@@ -1,0 +1,31 @@
+name: Task
+description: A unit of planned work (one issue = one branch = one PR).
+body:
+  - type: textarea
+    id: spec
+    attributes:
+      label: Spec
+      description: Quote or cite the relevant section(s) of docs/spec/ (e.g. "§5.5 get_successors").
+    validations:
+      required: true
+  - type: input
+    id: req
+    attributes:
+      label: REQ
+      description: Requirement IDs from docs/requirements.md (e.g. REQ-SRCH-03).
+      placeholder: REQ-
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Owner (planned)
+      description: From docs/plan.md §1 / §10.
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      value: |
+        - [ ] 
+    validations:
+      required: true
