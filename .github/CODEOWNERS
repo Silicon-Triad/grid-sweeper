@@ -4,16 +4,19 @@
 # partner Qazi as second owner; Qazi's paths keep Mujtaba as a third owner).
 
 # Default (root config: README, pyproject, requirements, ...): Qazi + Ashar
-*                       @Muhammad-Ahmed-Qazi @MUHAMMD-ASHAR-KHAN @MujtabaJRao
+*                       @Muhammad-Ahmed-Qazi @MUHAMMAD-ASHAR-KHAN @MujtabaJRao
 
-# env.py: Ashar (env parser) + Qazi (schedule parser) — each approves the other
-/src/cep/env.py         @MUHAMMD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
+# env.py: Ashar (env parser) + Qazi (schedule parser) — each approves the other.
+# Huzaifa listed so he is auto-requested: the schedule parser builds the
+# Constraints that csp.py consumes (#5).
+/src/cep/env.py         @MUHAMMAD-ASHAR-KHAN @Muhammad-Ahmed-Qazi @Huzaifa-Hanif-01
 
-# Ashar: generator, tests
-/tools/gen_env.py       @MUHAMMD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
-/tests/                 @MUHAMMD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
-# data/: Qazi authors own env + error files, Huzaifa own schedule; Ashar approves
-/data/                  @Muhammad-Ahmed-Qazi @MUHAMMD-ASHAR-KHAN
+# Ashar: tests (gen_env.py is set below, after /tools/)
+/tests/                 @MUHAMMAD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
+# data/: Qazi authors own env, error and sample files; Ashar approves.
+/data/                  @Muhammad-Ahmed-Qazi @MUHAMMAD-ASHAR-KHAN
+# Huzaifa authors own Schedule.txt (#9); Qazi approves.
+/data/Schedule*.txt     @Huzaifa-Hanif-01 @Muhammad-Ahmed-Qazi
 
 # Mujtaba: search
 /src/cep/search.py      @MujtabaJRao
@@ -22,15 +25,16 @@
 /src/cep/csp.py         @Huzaifa-Hanif-01
 
 # Qazi + Ashar: integration, render, CI, tooling, notebook
-/src/cep/integrate.py   @Muhammad-Ahmed-Qazi @MUHAMMD-ASHAR-KHAN @MujtabaJRao
-/src/cep/render.py      @Muhammad-Ahmed-Qazi @MUHAMMD-ASHAR-KHAN @MujtabaJRao
-/.github/               @Muhammad-Ahmed-Qazi @MUHAMMD-ASHAR-KHAN @MujtabaJRao
-/tools/                 @Muhammad-Ahmed-Qazi @MUHAMMD-ASHAR-KHAN @MujtabaJRao
-/tools/gen_env.py       @MUHAMMD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
-/notebook/              @Muhammad-Ahmed-Qazi @MUHAMMD-ASHAR-KHAN @MujtabaJRao
+/src/cep/integrate.py   @Muhammad-Ahmed-Qazi @MUHAMMAD-ASHAR-KHAN @MujtabaJRao
+/src/cep/render.py      @Muhammad-Ahmed-Qazi @MUHAMMAD-ASHAR-KHAN @MujtabaJRao
+/.github/               @Muhammad-Ahmed-Qazi @MUHAMMAD-ASHAR-KHAN @MujtabaJRao
+/tools/                 @Muhammad-Ahmed-Qazi @MUHAMMAD-ASHAR-KHAN @MujtabaJRao
+# Ashar: generator (must follow /tools/ to override it)
+/tools/gen_env.py       @MUHAMMAD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
+/notebook/              @Muhammad-Ahmed-Qazi @MUHAMMAD-ASHAR-KHAN @MujtabaJRao
 
 # Report: Ashar (assembler) + Qazi
-/report/                @MUHAMMD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
+/report/                @MUHAMMAD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
 
 # Qazi + Mujtaba: docs and rulebook
 /docs/                  @Muhammad-Ahmed-Qazi @MujtabaJRao

@@ -11,14 +11,15 @@ Internal finish: **Mon 16 Nov 2026**. Official deadline: 22 Nov 2026 (slack).
 
 | Member | Roll no. | GitHub | Owns | Rubric |
 |---|---|---|---|---|
-| Muhammad Ahmed Qazi | CS-24045 | `@Muhammad-Ahmed-Qazi` | infra, CI, `integrate.py`, `render.py`, notebook build + consolidation, schedule parser (in `env.py`), own `Environment.txt`, error files | C3, notebook |
+| Muhammad Ahmed Qazi | CS-24045 | `@Muhammad-Ahmed-Qazi` | infra, CI, `integrate.py`, `render.py`, notebook build + consolidation, schedule parser (in `env.py`), own `Environment.txt`, error files | C3, notebook; inputs for C1/C2 (REQ-ENV, REQ-CSP, REQ-TEST) |
 | Mujtaba Jawaid Rao | CS-24047 | `@MujtabaJRao` | `search.py`, algorithm comparison | C1, C4 |
 | Huzaifa Hanif | CS-24039 | `@Huzaifa-Hanif-01` | `csp.py` | C2 |
-| Muhammad Ashar Khan | CS-24035 | `@MUHAMMD-ASHAR-KHAN` | env parser (`env.py`), `tools/gen_env.py`, `tests/`, report | C5, verification |
+| Muhammad Ashar Khan | CS-24035 | `@MUHAMMAD-ASHAR-KHAN` | env parser (`env.py`), `tools/gen_env.py`, `tests/`, report | C5, verification (REQ-ENV, REQ-TEST) |
 
 Cross-review pairs (each person must be able to explain the other's area at the viva):
 - Mujtaba ↔ Huzaifa (search ↔ CSP)
 - Qazi ↔ Ashar (integration ↔ tests/env)
+- Huzaifa reviews the schedule parser (#5): it builds the `Constraints` that `csp.py` consumes
 
 Notebook filename: `CS24045.ipynb`.
 
@@ -245,11 +246,11 @@ All unassigned at creation; owner shown for assignment later. All in milestone s
 
 ## 11. Open items before population
 
-- [ ] Org name + four GitHub usernames (for CODEOWNERS)
-- [ ] Team approval of this plan
+- [x] Org name + four GitHub usernames (for CODEOWNERS)
+- [x] Team approval of this plan (2026-11-02)
 
 ---
 
 ## Changelog
 
-- 2026-11-02: #5, #8, #10 reassigned Ashar → Qazi (M0 load)
+- 2026-11-02: #5, #8, #10 reassigned Ashar → Qazi (M0 load). Ashar to confirm on PR #34 before merge.

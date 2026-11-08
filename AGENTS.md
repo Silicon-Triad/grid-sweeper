@@ -15,13 +15,13 @@ The PDFs win any conflict with `docs/plan.md`, `docs/requirements.md` or this fi
 | `docs/requirements.md` | REQ-IDs → spec §, rubric C#, verification | Qazi (team approves) |
 | `docs/decisions.md` | Design decisions where the spec is silent | all |
 | `docs/setup.md` | Dev environment | Qazi |
-| `src/cep/env.py` | Parsers, grid, validation | Ashar (env parser) + Qazi (schedule parser) |
+| `src/cep/env.py` | Parsers, grid, validation | Ashar (env parser) + Qazi (schedule parser); Huzaifa reviews schedule-parser changes |
 | `src/cep/search.py` | Successors, goal test, cost, heuristic, UCS/A* | Mujtaba |
 | `src/cep/csp.py` | MRV/degree, LCV, forward checking, backtracking | Huzaifa |
 | `src/cep/integrate.py` | `execute_schedule` | Qazi |
 | `src/cep/render.py` | Grid / path / schedule display | Qazi |
 | `tests/`, `tests/fixtures/` | Unit + property tests, edge-case input files | Ashar |
-| `data/` | `Environment*.txt`, `Schedule*.txt` input files | Qazi (own `Environment.txt`, error files) + Huzaifa (own `Schedule.txt`) |
+| `data/` | `Environment*.txt`, `Schedule*.txt` input files | Qazi (own `Environment.txt`, error files, sample files) + Huzaifa (own `Schedule.txt`); matches CODEOWNERS |
 | `tools/gen_env.py` | Random valid/invalid env + schedule generator | Ashar |
 | `tools/build_notebook.py` | Assembles the notebook from `src/` + markdown | Qazi |
 | `tools/ci_local.sh` | Runs every CI check locally | Qazi |
@@ -33,7 +33,7 @@ Owners (plan §1): Muhammad Ahmed Qazi `@Muhammad-Ahmed-Qazi` (infra, CI,
 integration, render, notebook, schedule parser, own `Environment.txt`,
 error files — C3), Mujtaba Jawaid Rao `@MujtabaJRao` (search,
 comparison — C1, C4), Huzaifa Hanif `@Huzaifa-Hanif-01` (CSP — C2), Muhammad
-Ashar Khan `@MUHAMMD-ASHAR-KHAN` (env parser, generator, tests, report — C5).
+Ashar Khan `@MUHAMMAD-ASHAR-KHAN` (env parser, generator, tests, report — C5).
 Cross-review pairs: Mujtaba ↔ Huzaifa, Qazi ↔ Ashar.
 
 ## Commands
