@@ -3,7 +3,7 @@
 Status: **APPROVED — 2026-11-02** (M. Ahmed Qazi)
 Repo: `Silicon-Triad/grid-sweeper` (public)
 Source of truth: `docs/spec/` (Problem Description + Grading Rubric PDFs, frozen). The PDFs win any conflict with this plan or `docs/requirements.md`.
-Internal finish: **Fri 20 Nov 2026** (rescheduled 2026-11-08). Official deadline: 22 Nov 2026 (slack).
+Internal finish: **Fri 20 Nov 2026** (rescheduled 2026-11-08). Official deadline: 22 Nov 2026 (only 2 days of slack).
 
 ---
 
@@ -137,7 +137,7 @@ Each requirement: one parent spec §, rationale, verification method (`test:<nam
 | **M3 Integration** | Sun 15 Nov | `execute_schedule` passes integration + property tests; 3 test runs captured |
 | **M4 Submission** | Fri 20 Nov | Notebook runs clean on submitted files; report complete + formatted; print-ready |
 
-Parallelism: after #3 + #4 land (9 Nov), search (M1) and CSP (M2) proceed in parallel; M1 and M2 share a due date.
+Parallelism: after #3 + #4 + #5 land (9 Nov), search (M1, needs #4) and CSP (M2, needs #5) proceed in parallel. M2 date is a review deadline, not a start date. M1 and M2 now share 12 Nov, so both cross-reviews (Mujtaba ↔ Huzaifa) land that day — open PRs early.
 
 ---
 
@@ -250,4 +250,5 @@ All unassigned at creation; owner shown for assignment later. All in milestone s
 
 ## Changelog
 
-- 2026-11-08: milestones rescheduled after M0/M1 slipped — M0 9 Nov, M1 + M2 12 Nov, M3 15 Nov, M4 20 Nov (official deadline 22 Nov unchanged).
+- 2026-11-08 (#41): milestones rescheduled after M0 and M1 slipped (M2 moves with them) — M0 9 Nov, M1 + M2 12 Nov, M3 15 Nov, M4 20 Nov (official deadline 22 Nov unchanged).
+- Re-approval: dates changed after the 2026-11-02 approval; the team re-approves by approving PR #37.
