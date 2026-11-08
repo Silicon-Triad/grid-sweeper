@@ -7,3 +7,4 @@ report's "Generative AI Use Declaration" (spec §8.2).
 |---|---|---|---|---|
 | 2026-11-02 | Qazi | Claude Code (Anthropic) | Repo scaffold: layout, configs, CI, templates, AGENTS.md, src/cep stubs (signatures + spec docstrings only); labels, milestones, issues | #1 |
 | 2026-11-02 | Qazi | Claude Code (Anthropic) | Fill GitHub usernames in CODEOWNERS / plan.md / AGENTS.md; mark plan approved; fix repo line in plan.md | #1 |
+| 2026-11-08 | Qazi | Claude Code (Anthropic) | Draft docs/requirements.md (REQ-IDs from spec); fix Ashar's username; move milestone dates | #2 |
