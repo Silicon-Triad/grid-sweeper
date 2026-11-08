@@ -6,11 +6,17 @@
 # Default (root config: README, pyproject, requirements, ...): Qazi + Ashar
 *                       @Muhammad-Ahmed-Qazi @MUHAMMAD-ASHAR-KHAN @MujtabaJRao
 
-# Ashar: env, generator, tests, data
-/src/cep/env.py         @MUHAMMAD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
-/tools/gen_env.py       @MUHAMMAD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
+# env.py: Ashar (env parser) + Qazi (schedule parser) — each approves the other.
+# Huzaifa listed so he is auto-requested: the schedule parser builds the
+# Constraints that csp.py consumes (#5).
+/src/cep/env.py         @MUHAMMAD-ASHAR-KHAN @Muhammad-Ahmed-Qazi @Huzaifa-Hanif-01
+
+# Ashar: tests (gen_env.py is set below, after /tools/)
 /tests/                 @MUHAMMAD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
-/data/                  @MUHAMMAD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
+# data/: Qazi authors own env, error and sample files; Ashar approves.
+/data/                  @Muhammad-Ahmed-Qazi @MUHAMMAD-ASHAR-KHAN
+# Huzaifa authors own Schedule.txt (#9); Qazi approves.
+/data/Schedule*.txt     @Huzaifa-Hanif-01 @Muhammad-Ahmed-Qazi
 
 # Mujtaba: search
 /src/cep/search.py      @MujtabaJRao
@@ -23,6 +29,7 @@
 /src/cep/render.py      @Muhammad-Ahmed-Qazi @MUHAMMAD-ASHAR-KHAN @MujtabaJRao
 /.github/               @Muhammad-Ahmed-Qazi @MUHAMMAD-ASHAR-KHAN @MujtabaJRao
 /tools/                 @Muhammad-Ahmed-Qazi @MUHAMMAD-ASHAR-KHAN @MujtabaJRao
+# Ashar: generator (must follow /tools/ to override it)
 /tools/gen_env.py       @MUHAMMAD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
 /notebook/              @Muhammad-Ahmed-Qazi @MUHAMMAD-ASHAR-KHAN @MujtabaJRao
 
