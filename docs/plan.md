@@ -3,7 +3,7 @@
 Status: **APPROVED — 2026-11-02** (M. Ahmed Qazi)
 Repo: `Silicon-Triad/grid-sweeper` (public)
 Source of truth: `docs/spec/` (Problem Description + Grading Rubric PDFs, frozen). The PDFs win any conflict with this plan or `docs/requirements.md`.
-Internal finish: **Mon 16 Nov 2026**. Official deadline: 22 Nov 2026 (slack).
+Internal finish: **Fri 20 Nov 2026** (rescheduled 2026-11-08). Official deadline: 22 Nov 2026 (slack).
 
 ---
 
@@ -131,13 +131,13 @@ Each requirement: one parent spec §, rationale, verification method (`test:<nam
 
 | Milestone | Due | Exit condition |
 |---|---|---|
-| **M0 Foundation** | Tue 3 Nov | Scaffold merged, CI green, requirements.md approved, parsers + gen_env + test skeletons merged, own/error data files committed |
-| **M1 Search** | Fri 6 Nov | UCS + A* pass all search tests incl. edge cases; comparison numbers produced |
-| **M2 CSP** | Mon 9 Nov | Solver passes all CSP tests incl. infeasible + unconstrained; constraint proof displayed |
-| **M3 Integration** | Wed 11 Nov | `execute_schedule` passes integration + property tests; 3 test runs captured |
-| **M4 Submission** | Mon 16 Nov | Notebook runs clean on submitted files; report complete + formatted; print-ready |
+| **M0 Foundation** | Mon 9 Nov | Scaffold merged, CI green, requirements.md approved, parsers + gen_env + test skeletons merged, own/error data files committed |
+| **M1 Search** | Thu 12 Nov | UCS + A* pass all search tests incl. edge cases; comparison numbers produced |
+| **M2 CSP** | Thu 12 Nov | Solver passes all CSP tests incl. infeasible + unconstrained; constraint proof displayed |
+| **M3 Integration** | Sun 15 Nov | `execute_schedule` passes integration + property tests; 3 test runs captured |
+| **M4 Submission** | Fri 20 Nov | Notebook runs clean on submitted files; report complete + formatted; print-ready |
 
-Parallelism: after #3 + #5 land (3 Nov), search (M1) and CSP (M2) proceed in parallel; M2 date is a review deadline, not a start date.
+Parallelism: after #3 + #4 land (9 Nov), search (M1) and CSP (M2) proceed in parallel; M1 and M2 share a due date.
 
 ---
 
@@ -190,7 +190,7 @@ Parallelism: after #3 + #5 land (3 Nov), search (M1) and CSP (M2) proceed in par
 
 All unassigned at creation; owner shown for assignment later. All in milestone shown.
 
-### M0 Foundation (due 3 Nov)
+### M0 Foundation (due 9 Nov)
 | # | Title | Labels | Owner | REQ | Acceptance |
 |---|---|---|---|---|---|
 | 1 | Scaffold: layout, configs, CI, templates, AGENTS.md | infra | Qazi (AI-assisted) | — | Layout per §3; CI runs green on empty stubs; rulesets applied |
@@ -204,7 +204,7 @@ All unassigned at creation; owner shown for assignment later. All in milestone s
 | 9 | Own `Schedule.txt` | csp | Huzaifa | REQ-CSP | ≥3 precedence, ≥2 latest-slot, feasible, includes ≥1 unconstrained task |
 | 10 | Error files `Environment_Error.txt` / `Schedule_Error.txt` | env, test | Ashar | REQ-TEST | Triggers no-path and/or infeasible-schedule path; failure reported cleanly |
 
-### M1 Search (due 6 Nov)
+### M1 Search (due 12 Nov)
 | # | Title | Labels | Owner | REQ | Acceptance |
 |---|---|---|---|---|---|
 | 11 | `get_successors`, `goal_test`, `path_cost`, `heuristic` | search, feature | Mujtaba | REQ-SRCH | Ashar's unit tests pass; empty + single-state path handled |
@@ -214,7 +214,7 @@ All unassigned at creation; owner shown for assignment later. All in milestone s
 | 15 | Heuristic justification (admissible + consistent) | search, docs | Mujtaba | REQ-SRCH | Markdown cell + report paragraph with argument |
 | 16 | Algorithm comparison: table + plot + analysis | search, analysis | Mujtaba | REQ-CMP | Path, cost, nodes for both on ≥3 start/goal pairs + scaling over grid sizes; quantitative + qualitative discussion |
 
-### M2 CSP (due 9 Nov)
+### M2 CSP (due 12 Nov)
 | # | Title | Labels | Owner | REQ | Acceptance |
 |---|---|---|---|---|---|
 | 17 | `select_unassigned_variable` (MRV + degree) | csp, feature | Huzaifa | REQ-CSP | Tie-break by degree verified by test |
@@ -224,7 +224,7 @@ All unassigned at creation; owner shown for assignment later. All in milestone s
 | 21 | `backtracking_search` + infeasible reporting | csp, feature | Huzaifa | REQ-CSP | Vars from all dirty cells incl. unconstrained; infeasible → `None` + message |
 | 22 | Schedule display + per-constraint proof | csp | Huzaifa | REQ-CSP | Each constraint printed with ✓/✗ and evidence |
 
-### M3 Integration (due 11 Nov)
+### M3 Integration (due 15 Nov)
 | # | Title | Labels | Owner | REQ | Acceptance |
 |---|---|---|---|---|---|
 | 23 | `execute_schedule` | integration, feature | Qazi | REQ-INT | Start/end at charger; schedule order; no duplicated joints; unreachable → `success=False` |
@@ -232,7 +232,7 @@ All unassigned at creation; owner shown for assignment later. All in milestone s
 | 25 | Property tests across modules (hypothesis) | test | Ashar | REQ-TEST | Invariants hold over ≥200 generated cases; runs < 60 s in CI |
 | 26 | Three test runs + screenshots | test | Ashar | REQ-TEST | Own, sample, error runs captured for notebook and report |
 
-### M4 Submission (due 16 Nov)
+### M4 Submission (due 20 Nov)
 | # | Title | Labels | Owner | REQ | Acceptance |
 |---|---|---|---|---|---|
 | 27 | `build_notebook.py` + consolidated `CS24045.ipynb` | notebook | Qazi | REQ-NB | Names/roll nos. first cell; markdown per section; runs top-to-bottom on submitted files |
@@ -247,3 +247,7 @@ All unassigned at creation; owner shown for assignment later. All in milestone s
 
 - [ ] Org name + four GitHub usernames (for CODEOWNERS)
 - [ ] Team approval of this plan
+
+## Changelog
+
+- 2026-11-08: milestones rescheduled after M0/M1 slipped — M0 9 Nov, M1 + M2 12 Nov, M3 15 Nov, M4 20 Nov (official deadline 22 Nov unchanged).
