@@ -34,7 +34,8 @@ choices where the spec is silent, except ``State`` (spec §5.3):
     - ``ACTIONS``: ``UP, DOWN, LEFT, RIGHT`` with their row/column deltas.
     - ``ALGORITHMS``: ``"ucs"``, ``"astar"`` (DEC-01).
     - ``Grid``, ``Constraints``: frozen dataclasses below.
-Environment parsing: issue #4 (rules DEC-07 to DEC-11, DEC-13). Schedule parsing: #5.
+Environment parsing: issue #4 (rules DEC-07 to DEC-11, DEC-13). Schedule parsing:
+issue #5 (rules DEC-07 to DEC-10, DEC-12, DEC-13).
 """
 
 import re
@@ -362,3 +363,115 @@ def load_environment(path: str | Path) -> Grid:
     """
     path = Path(path)
     return parse_environment(path.read_text(encoding="utf-8"), source=path.name)
+
+
+# One "(a,b)" pair per line (DEC-10). Items are captured loosely so that the
+# error can name a bad label or slot instead of just "malformed".
+_PAIR_RE = re.compile(r"\(\s*([^,()\s]+)\s*,\s*([^,()\s]+)\s*\)")
+# Slots written "T3" as in the sample, or plain "3" (DEC-12).
+_SLOT_RE = re.compile(r"T?(\d+)")
+
+
+def parse_schedule(text: str, grid: Grid, source: str = "Schedule.txt") -> Constraints:
+    """Parse Schedule.txt content into Constraints (spec §6.3, REQ-CSP-02).
+
+    Format: slot count; precedence count; one ``(before,after)`` pair per line;
+    latest-slot count; one ``(task,slot)`` pair per line. Validation rules are
+    DEC-07 to DEC-10 and DEC-12. Feasibility is not checked here: an
+    unsatisfiable but well-formed file is for the CSP solver to report
+    (REQ-CSP-12).
+
+    Args:
+        text: Whole file content.
+        grid: Environment the tasks refer to; supplies the labels D1…Dn.
+        source: Name used in error messages.
+
+    Returns:
+        Constraints whose ``variables`` are all dirty labels in file order,
+        including tasks no constraint mentions (REQ-CSP-03).
+
+    Raises:
+        InputError: On the first format or validation problem found.
+    """
+    reader = _LineReader(text, source)
+    labels = tuple(grid.dirty)
+
+    lineno = reader.lines[0][0] if reader.lines else 1
+    num_slots = _parse_count(reader, "number of time slots")
+    # Slot exclusivity means each task needs its own slot (spec §6.4, REQ-CSP-08).
+    if num_slots < len(labels):
+        raise reader.error(
+            lineno, f"{num_slots} time slots but {len(labels)} dirty locations"
+        )
+
+    def read_pair(what: str) -> tuple[int, str, str]:
+        """Read one ``(a,b)`` line; return its line number and both items."""
+        lineno, line = reader.next(f"{what} pair")
+        match = _PAIR_RE.fullmatch(line)
+        if not match:
+            # A bare number here usually means the count above is too high.
+            hint = " (count too high?)" if line.isdigit() else ""
+            raise reader.error(lineno, f"malformed {what} pair {line!r}{hint}")
+        return lineno, match[1], match[2]
+
+    def check_label(label: str, lineno: int) -> None:
+        """Labels must name a dirty cell of the grid (spec §6.4, REQ-CSP-08)."""
+        if label not in grid.dirty:
+            raise reader.error(
+                lineno,
+                f"unknown task {label!r} (grid has {', '.join(labels) or 'none'})",
+            )
+
+    precedence: list[tuple[Label, Label]] = []
+    for _ in range(_parse_count(reader, "number of precedence constraints")):
+        lineno, before, after = read_pair("precedence")
+        check_label(before, lineno)
+        check_label(after, lineno)
+        # A repeated pair adds nothing, so it is kept once (DEC-12). (X,X) is
+        # kept: it is infeasible, not malformed, so the solver reports it.
+        if (before, after) not in precedence:
+            precedence.append((before, after))
+
+    latest: dict[Label, Slot] = {}
+    for _ in range(_parse_count(reader, "number of latest-slot constraints")):
+        lineno, task, slot_text = read_pair("latest-slot")
+        check_label(task, lineno)
+        match = _SLOT_RE.fullmatch(slot_text)
+        if not match:
+            raise reader.error(
+                lineno, f"slot must look like T3 or 3, got {slot_text!r}"
+            )
+        slot = int(match[1])
+        if not 1 <= slot <= num_slots:
+            raise reader.error(lineno, f"slot {slot_text} outside T1..T{num_slots}")
+        # Two limits for one task could disagree; latest holds one (DEC-12).
+        if task in latest:
+            raise reader.error(lineno, f"second latest-slot constraint for {task}")
+        latest[task] = slot
+
+    reader.expect_end()
+
+    return Constraints(
+        variables=labels,
+        num_slots=num_slots,
+        precedence=tuple(precedence),
+        latest=MappingProxyType(latest),
+    )
+
+
+def load_schedule(path: str | Path, grid: Grid) -> Constraints:
+    """Load and validate a Schedule.txt file (REQ-CSP-01).
+
+    Args:
+        path: File to read; supplied by the caller, never hardcoded.
+        grid: Environment the tasks refer to.
+
+    Returns:
+        The validated Constraints.
+
+    Raises:
+        InputError: If the content is invalid (message names the file).
+        OSError: If the file cannot be read.
+    """
+    path = Path(path)
+    return parse_schedule(path.read_text(encoding="utf-8"), grid, source=path.name)

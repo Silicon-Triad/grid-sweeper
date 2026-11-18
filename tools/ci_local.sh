@@ -157,6 +157,12 @@ jobs=("$@"); [ ${#jobs[@]} -eq 0 ] && read -ra jobs <<<"$ALL"
 fail=0
 for j in "${jobs[@]}"; do
   echo "=== $j"
-  if "job_${j//-/_}"; then echo "--- $j: PASS"; else echo "--- $j: FAIL"; fail=1; fi
+  # Run the job in a subshell outside any `if`/`||`: bash ignores `set -e` in
+  # a condition, so only the job's last command would decide PASS/FAIL.
+  set +e
+  ( set -e; "job_${j//-/_}" )
+  rc=$?
+  set -e
+  if [ "$rc" -eq 0 ]; then echo "--- $j: PASS"; else echo "--- $j: FAIL"; fail=1; fi
 done
 exit "$fail"
