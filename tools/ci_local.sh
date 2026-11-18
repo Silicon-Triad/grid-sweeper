@@ -118,16 +118,11 @@ job_ai_boundary() {
     git log -1 --format=%B "$c" \
       | grep -qiE '^co-authored-by:.*(claude|anthropic|copilot|openai|chatgpt|codex|gemini|cursor)' \
       || continue
-    # Scaffold exemption: parent has no src/cep/ (only true for the scaffold commit).
-    if ! git cat-file -e "$c^:src/cep" 2>/dev/null && git cat-file -e "$c:src/cep" 2>/dev/null; then
-      echo "ai-boundary: $c is the scaffold commit (exempt)"
-      continue
-    fi
     local files
     files=$(git diff-tree --no-commit-id --name-only -r --root "$c")
     local hits
-    hits=$(echo "$files" | grep -E '^(src/|tests/|data/|tools/gen_env\.py$|notebook/.*\.ipynb$|report/)' \
-                         | grep -vE '^report/genai_log\.md$' || true)
+    # Since #44 AI may edit any path except the frozen spec.
+    hits=$(echo "$files" | grep -E '^docs/spec/' || true)
     if [ -n "$hits" ]; then
       echo "ai-boundary: AI-co-authored commit $c touches forbidden paths:"
       echo "$hits" | sed 's/^/  /'

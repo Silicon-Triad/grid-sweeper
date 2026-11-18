@@ -117,17 +117,11 @@ Internal types (fixed in M0, issue #3): `state = (row, col)`; `Grid` structure;
 
 ## AI rules (plan §2)
 
-**AI may:** write/edit `docs/` (except `docs/spec/`), `.github/`,
-`tools/ci_local.sh`, `tools/build_notebook.py`; create issues, labels,
-milestones; write PR descriptions; review PRs; run tests and report results.
-
-**AI may not:** author or edit `src/`, `tests/`, `tools/gen_env.py`, `data/`,
-solution cells of the notebook, or report prose. Review comments may point at
-bugs; a human writes the fix.
-
-One exception: the scaffold commit (#1) created `src/cep/*.py` stubs containing
-only the frozen signatures, docstrings quoting the spec, and
-`raise NotImplementedError`. `ai-boundary` is enforced from the commit after it.
+**AI may** author or edit any path **except `docs/spec/`**: `src/`, `tests/`,
+`tools/`, `data/`, notebook cells, docs, `.github/`, and report material.
+AI may also create issues, labels and milestones, write PR descriptions, review
+PRs, run tests and report results. (Changed 2026-11-18, #44: the earlier
+restriction on AI-authored code was lifted by team decision under time pressure.)
 
 Additionally, every AI agent must:
 
@@ -141,10 +135,18 @@ Additionally, every AI agent must:
 - State the model used in the PR ("Model used: <model> (for: …)").
 - Log every use in `report/genai_log.md` (date, person, tool/model, purpose, issue).
 - Mark AI-authored commits with a `Co-Authored-By:` trailer naming the tool —
-  this is what `ai-boundary` checks.
+  `ai-boundary` uses it to check that no AI commit touches `docs/spec/`.
+
+Humans who use AI must:
+
+- Be able to explain every line of an AI-authored PR they open or merge — at the
+  viva, C6 is graded individually.
+- Declare AI-written report prose (in `report/genai_log.md` and the report's
+  Generative AI declaration).
 
 ## CI (plan §9)
 
 `lint`, `test`, `robustness`, `interface`, `notebook`, `traceability` (PRs only),
 `ai-boundary`, `spec-frozen`. Each runs `tools/ci_local.sh <job>`; jobs skip
-gracefully while tests or the notebook do not exist yet.
+gracefully while tests or the notebook do not exist yet. `ai-boundary` fails
+only if a commit with an AI `Co-Authored-By` trailer touches `docs/spec/`.
