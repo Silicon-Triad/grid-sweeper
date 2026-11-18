@@ -67,3 +67,13 @@ comes from a `spec-question` issue, is labelled `design-decision`, and is
 - **Rationale:** Follows the spec wording ("number of other unassigned variables"). Exclusivity links every pair of unassigned variables, adding the same constant to every score, so it never changes the ranking; excluding it keeps the count meaningful. The file-order tie-break makes variable order — and hence the schedule found when several are valid — deterministic and testable. Affects only which valid schedule is found and search effort, never feasibility.
 - **Affects REQ-IDs:** REQ-CSP-13
 - **Decided by / date:** Qazi, 2026-11-18
+
+### DEC-06 — Internal types: `Grid`, `Constraints`, slots, schedule — **DECIDED**
+- **Issue:** #3
+- **Spec reference:** §5.5 "grid: Environment representation"; §6.5 "constraints: Scheduling constraints"; §7.2 "schedule: Cleaning tasks ordered according to their assigned time slots" — structure not specified.
+- **Question:** How are `Grid`, `Constraints`, slots and the `schedule` argument represented?
+- **Options considered:** (A) plain dicts/sets; (B) frozen dataclasses; (C) cell-character matrix + metadata. Slots as ints vs `"T<n>"` strings. Schedule as labels vs `(label, state)` pairs. Variable order inside `Constraints` vs derived from label numbers.
+- **Decision:** (B) frozen dataclasses `Grid(rows, cols, obstacles, dirty, charger)` and `Constraints(variables, num_slots, precedence, latest)`; slots are ints `1…n` (displayed `T<n>`); `schedule` is a list of labels in slot order, converted to cells via `grid.dirty`; `variables` (file order) lives in `Constraints`. Full table in AGENTS.md "Internal types". Team choice, not a spec value.
+- **Rationale:** Typos in field names fail at once; immutability stops integration marking cells cleaned on the shared grid (REQ-INT-03 runs repeat per algorithm). Int slots avoid string-order bugs at ≥10 slots/tasks (`"T10" < "T9"`). `select_unassigned_variable` receives no `variables` argument yet needs file order for DEC-05, so `Constraints` carries it. Labels as the schedule match the spec wording "cleaning tasks".
+- **Affects REQ-IDs:** REQ-ENV-03, REQ-ENV-06, REQ-ENV-07, REQ-CSP-04, REQ-CSP-13, REQ-INT-01
+- **Decided by / date:** Qazi, 2026-11-18

@@ -89,9 +89,41 @@ backtracking_search(variables, domains, constraints) -> assignment | None
 execute_schedule(grid, charging_station, schedule, algorithm) -> (complete_path, total_cost, success)
 ```
 
-Internal types (fixed in M0, issue #3): `state = (row, col)`; `Grid` structure;
-`Constraints` structure; algorithm names `"ucs"`, `"astar"`. Documentation of
-`Grid` and `Constraints` is added here by #3.
+### Internal types (issue #3, DEC-06; defined in `src/cep/env.py`)
+
+| Type | Definition | Used by |
+|---|---|---|
+| `state` | `tuple[int, int]` = `(row, col)`, zero-based, top-left `(0,0)` (REQ-ENV-03) | search, integrate |
+| action | one of `"UP"`, `"DOWN"`, `"LEFT"`, `"RIGHT"` (REQ-SRCH-02) | search |
+| task label | `str` `"D1"…"Dn"`, numbered in file order (REQ-ENV-04) | env, csp, integrate |
+| slot | `int` `1…n`; shown as `T<n>` only in output. Never compare labels/slots as strings (`"T10" < "T9"`). | csp, integrate, render |
+| algorithm | `"ucs"` or `"astar"` (DEC-01) | search, integrate |
+
+**`Grid`** — frozen dataclass (immutable; integration tracks cleaned cells itself):
+
+| Field | Type | Meaning |
+|---|---|---|
+| `rows`, `cols` | `int` | grid dimensions (line 1) |
+| `obstacles` | `frozenset[state]` | blocked cells (line 3) |
+| `dirty` | `dict[str, state]`, insertion order = file order | label → cell (line 5) |
+| `charger` | `state` | charging station (line 6) |
+
+Free cells = in-bounds cells not in `obstacles`; dirty and charger cells are
+passable. `get_successors` excludes only out-of-bounds and obstacle cells.
+
+**`Constraints`** — frozen dataclass:
+
+| Field | Type | Meaning |
+|---|---|---|
+| `variables` | `tuple[str, ...]` | all task labels in file order (from `Grid.dirty`), incl. unconstrained (REQ-CSP-03); DEC-05 tie-break order |
+| `num_slots` | `int` | available slots (line 1) |
+| `precedence` | `tuple[tuple[str, str], ...]` | `(before, after)` pairs (REQ-CSP-05) |
+| `latest` | `dict[str, int]` | label → latest slot (REQ-CSP-06) |
+
+Slot exclusivity is implicit (REQ-CSP-07). Initial `domains`: `dict[str, set[int]]`,
+every variable → `{1…num_slots}` (REQ-CSP-04). `assignment`: `dict[str, int]`.
+`execute_schedule`'s `schedule`: `list[str]` of labels in slot order; it converts
+them to cells via `grid.dirty`.
 
 ## Workflow (plan §8)
 
