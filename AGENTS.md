@@ -15,13 +15,13 @@ The PDFs win any conflict with `docs/plan.md`, `docs/requirements.md` or this fi
 | `docs/requirements.md` | REQ-IDs → spec §, rubric C#, verification | Qazi (team approves) |
 | `docs/decisions.md` | Design decisions where the spec is silent | all |
 | `docs/setup.md` | Dev environment | Qazi |
-| `src/cep/env.py` | Parsers, grid, validation | Ashar (env parser) + Qazi (schedule parser); Huzaifa reviews schedule-parser changes |
+| `src/cep/env.py` | Parsers, grid, validation | Qazi (types, env + schedule parsers); Huzaifa reviews schedule-parser changes |
 | `src/cep/search.py` | Successors, goal test, cost, heuristic, UCS/A* | Mujtaba |
 | `src/cep/csp.py` | MRV/degree, LCV, forward checking, backtracking | Huzaifa |
 | `src/cep/integrate.py` | `execute_schedule` | Qazi |
 | `src/cep/render.py` | Grid / path / schedule display | Qazi |
 | `tests/`, `tests/fixtures/` | Unit + property tests, edge-case input files | Ashar |
-| `data/` | `Environment*.txt`, `Schedule*.txt` input files | Qazi (own `Environment.txt`, error files, sample files) + Huzaifa (own `Schedule.txt`); matches CODEOWNERS |
+| `data/` | `Environment*.txt`, `Schedule*.txt` input files | Qazi (own `Environment.txt`, own `Schedule.txt`, error files, sample files); matches CODEOWNERS |
 | `tools/gen_env.py` | Random valid/invalid env + schedule generator | Ashar |
 | `tools/build_notebook.py` | Assembles the notebook from `src/` + markdown | Qazi |
 | `tools/ci_local.sh` | Runs every CI check locally | Qazi |
@@ -30,10 +30,10 @@ The PDFs win any conflict with `docs/plan.md`, `docs/requirements.md` or this fi
 | `.github/` | CI, CODEOWNERS, PR/issue templates | Qazi + Ashar |
 
 Owners (plan §1): Muhammad Ahmed Qazi `@Muhammad-Ahmed-Qazi` (infra, CI,
-integration, render, notebook, schedule parser, own `Environment.txt`,
-error files — C3), Mujtaba Jawaid Rao `@MujtabaJRao` (search,
+integration, render, notebook, `env.py` types + env/schedule parsers,
+own `Environment.txt` + `Schedule.txt`, error files — C3), Mujtaba Jawaid Rao `@MujtabaJRao` (search,
 comparison — C1, C4), Huzaifa Hanif `@Huzaifa-Hanif-01` (CSP — C2), Muhammad
-Ashar Khan `@MUHAMMAD-ASHAR-KHAN` (env parser, generator, tests, report — C5).
+Ashar Khan `@MUHAMMAD-ASHAR-KHAN` (generator, tests, report only — C5).
 Cross-review pairs: Mujtaba ↔ Huzaifa, Qazi ↔ Ashar.
 
 ## Commands
@@ -98,9 +98,11 @@ Internal types (fixed in M0, issue #3): `state = (row, col)`; `Grid` structure;
 1. One branch per issue: `<issue#>-<short-slug>` (e.g. `12-astar`).
 2. Commits cite REQ-IDs: `search: add A* (REQ-SRCH-05) #12`.
 3. PR → template filled (issue, REQ-IDs, tests run, model used) → 1 approval
-   from the code owner of every touched area → squash merge.
-4. `main` is protected: PR required, 1 approval, code-owner review, squash
-   only, no force push/deletion, required checks green.
+   from the code owner of every touched area → squash merge. Exception
+   (project-lead decision, 18 Nov): the lead's (Qazi's) PRs need no other
+   member's approval; required CI checks must still be green before merge.
+4. `main` is protected: PR required, 1 approval, code-owner review (not for
+   the lead's PRs, see 3), squash only, no force push/deletion, required checks green.
 5. Spec silent? Open a `spec-question` issue. Record the decision in
    `docs/decisions.md`, label `design-decision` — never present it as a spec value.
 

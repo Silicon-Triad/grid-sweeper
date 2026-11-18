@@ -40,7 +40,7 @@ criterion, rationale, and a verification method:
 | REQ-SRCH-03 | `get_successors(state, grid)` returns `(next_state, action, step_cost)`, excluding out-of-bounds and obstacle cells | §5.5 | C1 | Required function | `test:test_successors_bounds_obstacles` |
 | REQ-SRCH-04 | Each valid move costs 1 | §5.3 | C1 | Step cost | `test:test_successors_cost` |
 | REQ-SRCH-05 | `goal_test(state, goal_state)` returns True iff equal | §5.5 | C1 | Required function | `test:test_goal_test` |
-| REQ-SRCH-06 | `path_cost(path)` = number of moves (len(path) − 1) for non-empty paths; single-state path → 0; empty path handled appropriately (value: DEC-04, #39) | §5.5 | C1 | Required function + named edge cases | `test:test_path_cost_edges` |
+| REQ-SRCH-06 | `path_cost(path)` = number of moves (len(path) − 1) for non-empty paths; single-state path → 0; empty path → 0 (DEC-04, #39) | §5.5 | C1 | Required function + named edge cases | `test:test_path_cost_edges` |
 | REQ-SRCH-07 | `heuristic(state, goal_state)` estimates cost to goal (team choice: Manhattan, DEC-02; spec says "may") | §5.5 | C1 | Required function | `test:test_heuristic_manhattan` |
 | REQ-SRCH-08 | Justify the heuristic's suitability (admissible, consistent) | §5.5 | C1 | Explicitly required | `report:Graph-Based Search Algorithms` |
 | REQ-SRCH-09 | `search(grid, start, goal, algorithm)` returns path or no-path indication, cost, nodes_expanded | §5.5 | C1 | Required function | `test:test_search_returns` |
@@ -63,7 +63,7 @@ criterion, rationale, and a verification method:
 | REQ-CSP-10 | Own `Schedule.txt`: ≥3 precedence and ≥2 latest-slot constraints | §6.4 | C2 | Minimum constraints | `test:test_schedule_own_minimums` |
 | REQ-CSP-11 | Every task gets exactly one slot; all constraints satisfied | §6.2, §6.4 | C2 | Validity | `test:test_csp_solution_valid` |
 | REQ-CSP-12 | Report when no feasible schedule exists | §6.4 | C2 | Failure handling | `test:test_csp_infeasible` |
-| REQ-CSP-13 | `select_unassigned_variable`: MRV; ties broken by degree = number of other unassigned *variables* connected through constraints (what counts: DEC-05, #40) | §6.5 | C2 | Required function | `test:test_select_mrv_degree` |
+| REQ-CSP-13 | `select_unassigned_variable`: MRV; ties broken by degree = number of distinct other unassigned *variables* linked by precedence (exclusivity not counted); remaining ties by file order D1…Dn (DEC-05, #40) | §6.5 | C2 | Required function | `test:test_select_mrv_degree` |
 | REQ-CSP-14 | `order_domain_values`: returns ordered candidate slots, using LCV | §6.5 | C2 | Required function (LCV optional in solver) | `test:test_order_lcv` |
 | REQ-CSP-15 | `is_consistent`: checks every constraint evaluable with the current assignment | §6.5 | C2 | Required function | `test:test_is_consistent_partial` |
 | REQ-CSP-16 | `forward_check`: prunes related unassigned domains; fails on any empty domain | §6.5 | C2 | Required function | `test:test_forward_check_prune_fail` |

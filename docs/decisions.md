@@ -48,22 +48,22 @@ comes from a `spec-question` issue, is labelled `design-decision`, and is
 - **Affects REQ-IDs:** REQ-NB-01, REQ-RPT-12
 - **Decided by / date:** Qazi (planning), 2026-11-02; team confirms via PR #36
 
-### DEC-04 — `path_cost` of an empty path — **OPEN**
+### DEC-04 — `path_cost` of an empty path — **DECIDED**
 - **Issue:** #39
 - **Spec reference:** §5.5 "An empty path … must be handled appropriately"
 - **Question:** What value (or error) does `path_cost([])` return?
 - **Options considered:** 0; `None`/`inf`; raise `ValueError`
-- **Decision:** *pending — Mujtaba*
-- **Rationale:**
+- **Decision:** `path_cost([])` returns `0` (team choice, not a spec value). Single-state path → `0` per the spec formula.
+- **Rationale:** An empty path contains no moves, so 0 is consistent with "cost = number of movements" and keeps the `int` return type. "No path" is signalled by `search` returning `(None, None, nodes_expanded)` (§5.5), never by `path_cost`; `execute_schedule` must check `success`/`None`, not rely on cost, to detect an unreachable leg. In normal runs `[]` never reaches `path_cost` — only direct calls (tests).
 - **Affects REQ-IDs:** REQ-SRCH-06
-- **Decided by / date:**
+- **Decided by / date:** Qazi, 2026-11-18
 
-### DEC-05 — Degree heuristic: what counts as a connection — **OPEN**
+### DEC-05 — Degree heuristic: what counts as a connection — **DECIDED**
 - **Issue:** #40
 - **Spec reference:** §6.5 "the variable connected to the largest number of other unassigned variables through constraints"
 - **Question:** Count distinct variables or constraints? Does slot exclusivity count (if so, every variable ties)?
 - **Options considered:** precedence only; precedence + exclusivity
-- **Decision:** *pending — Huzaifa*
-- **Rationale:**
+- **Decision:** Degree = number of *distinct other unassigned variables* linked to the variable by a precedence constraint. Slot exclusivity is not counted. Ties remaining after MRV + degree are broken by file order (D1…Dn) (team choice, not a spec value).
+- **Rationale:** Follows the spec wording ("number of other unassigned variables"). Exclusivity links every pair of unassigned variables, adding the same constant to every score, so it never changes the ranking; excluding it keeps the count meaningful. The file-order tie-break makes variable order — and hence the schedule found when several are valid — deterministic and testable. Affects only which valid schedule is found and search effort, never feasibility.
 - **Affects REQ-IDs:** REQ-CSP-13
-- **Decided by / date:**
+- **Decided by / date:** Qazi, 2026-11-18

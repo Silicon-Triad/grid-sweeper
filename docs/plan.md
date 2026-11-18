@@ -11,14 +11,14 @@ Internal finish: **Fri 20 Nov 2026** (rescheduled 2026-11-08). Official deadline
 
 | Member | Roll no. | GitHub | Owns | Rubric |
 |---|---|---|---|---|
-| Muhammad Ahmed Qazi | CS-24045 | `@Muhammad-Ahmed-Qazi` | infra, CI, `integrate.py`, `render.py`, notebook build + consolidation, schedule parser (in `env.py`), own `Environment.txt`, error files | C3, notebook; inputs for C1/C2 (REQ-ENV, REQ-CSP, REQ-TEST) |
+| Muhammad Ahmed Qazi | CS-24045 | `@Muhammad-Ahmed-Qazi` | infra, CI, `integrate.py`, `render.py`, notebook build + consolidation, `env.py` (internal types, environment + schedule parsers), `data/` (own `Environment.txt`, own `Schedule.txt`, error files) | C3, notebook; inputs for C1/C2 (REQ-ENV, REQ-CSP, REQ-TEST) |
 | Mujtaba Jawaid Rao | CS-24047 | `@MujtabaJRao` | `search.py`, algorithm comparison | C1, C4 |
 | Huzaifa Hanif | CS-24039 | `@Huzaifa-Hanif-01` | `csp.py` | C2 |
-| Muhammad Ashar Khan | CS-24035 | `@MUHAMMAD-ASHAR-KHAN` | env parser (`env.py`), `tools/gen_env.py`, `tests/`, report | C5, verification (REQ-ENV, REQ-TEST) |
+| Muhammad Ashar Khan | CS-24035 | `@MUHAMMAD-ASHAR-KHAN` | testing + report only: `tools/gen_env.py`, `tests/`, `report/` (#6, #7, #25, #26, #29, #30; assembles #28) — starts once most implementation has landed | C5, verification (REQ-TEST, REQ-RPT) |
 
 Cross-review pairs (each person must be able to explain the other's area at the viva):
 - Mujtaba ↔ Huzaifa (search ↔ CSP)
-- Qazi ↔ Ashar (integration ↔ tests/env)
+- Qazi ↔ Ashar (integration/env ↔ tests)
 - Huzaifa reviews the schedule parser (#5): it builds the `Constraints` that `csp.py` consumes
 
 Notebook filename: `CS24045.ipynb`.
@@ -56,7 +56,7 @@ cs323-cep-vacuum-robot/
 │   ├── Environment_Sample.txt   Schedule_Sample.txt    # from spec
 │   └── Environment_Error.txt    Schedule_Error.txt     # failure case
 ├── src/cep/
-│   ├── env.py        # parsers, grid, validation           (Ashar: env parser; Qazi: schedule parser)
+│   ├── env.py        # parsers, grid, validation           (Qazi: types, env + schedule parsers)
 │   ├── search.py     # successors, goal, cost, h, search   (Mujtaba)
 │   ├── csp.py        # MRV/degree, LCV, FC, backtracking   (Huzaifa)
 │   ├── integrate.py  # execute_schedule                    (Qazi)
@@ -138,6 +138,14 @@ Each requirement: one parent spec §, rationale, verification method (`test:<nam
 | **M3 Integration** | Sun 15 Nov | `execute_schedule` passes integration + property tests; 3 test runs captured |
 | **M4 Submission** | Fri 20 Nov | Notebook runs clean on submitted files; report complete + formatted; print-ready |
 
+**2-day schedule (from 18 Nov; supersedes the dates above where they have passed):**
+
+| Day | Date | Focus |
+|---|---|---|
+| Day 1 | Wed 18 Nov | Implementation: remaining env/schedule parsing (#3, #4, #5), data files (#8, #9, #10), search (#11–#16), CSP (#17–#22) |
+| Day 2 | Thu 19 Nov | Integration (#23, #24), tests + test runs (#7, #25, #26), notebook (#27), report (#28–#30) |
+| Buffer | 20–22 Nov | Fixes, final checks, submission (#31); official deadline 22 Nov |
+
 Parallelism: after #3 + #4 + #5 land (9 Nov), search (M1, needs #4) and CSP (M2, needs #5) proceed in parallel. M2 date is a review deadline, not a start date. M1 and M2 now share 12 Nov, so both cross-reviews (Mujtaba ↔ Huzaifa) land that day — open PRs early.
 
 ---
@@ -156,8 +164,8 @@ Parallelism: after #3 + #4 + #5 land (9 Nov), search (M1, needs #4) and CSP (M2,
 
 1. One branch per issue: `<issue#>-<short-slug>` (e.g. `12-astar`).
 2. Commits cite REQ-IDs: `search: add A* (REQ-SRCH-05) #12`.
-3. PR → template filled (issue, REQ-IDs, tests run, model used) → 1 approval from the code owner of every touched area → squash merge.
-4. `main` protected by org ruleset: PR required, 1 approval, code-owner review, squash only, no force push/deletion, required checks green.
+3. PR → template filled (issue, REQ-IDs, tests run, model used) → 1 approval from the code owner of every touched area → squash merge. **Exception (project-lead decision, 18 Nov):** the lead's (Qazi's) PRs no longer require another member's approval; required CI checks must still be green before merge.
+4. `main` protected by org ruleset: PR required, 1 approval, code-owner review (not required for the lead's PRs, see 3), squash only, no force push/deletion, required checks green.
 5. Spec silent? Open a `spec-question` issue. Decision recorded in `docs/decisions.md`, labelled `design-decision` — never presented as a spec value.
 
 ### Done checklist (per PR)
@@ -196,13 +204,13 @@ All unassigned at creation; owner shown for assignment later. All in milestone s
 |---|---|---|---|---|---|
 | 1 | Scaffold: layout, configs, CI, templates, AGENTS.md | infra | Qazi (AI-assisted) | — | Layout per §3; CI runs green on empty stubs; rulesets applied |
 | 2 | Write `docs/requirements.md` from spec | docs | Qazi (AI draft, team approve) | all | Every spec "must" has an ID, parent §, rubric C#, verification method; 4 approvals |
-| 3 | Fix internal types: `Grid`, `Constraints`, algorithm names | env, frozen-interface | Ashar | REQ-ENV | Types documented in `env.py` docstring + AGENTS.md; reviewed by all owners |
-| 4 | Environment parser + grid | env, feature | Ashar | REQ-ENV | Parses sample; D1…Dn in file order; clean error on malformed/overlapping/out-of-bounds input |
+| 3 | Fix internal types: `Grid`, `Constraints`, algorithm names | env, frozen-interface | Qazi | REQ-ENV | Types documented in `env.py` docstring + AGENTS.md; reviewed by all owners |
+| 4 | Environment parser + grid | env, feature | Qazi | REQ-ENV | Parses sample; D1…Dn in file order; clean error on malformed/overlapping/out-of-bounds input |
 | 5 | Schedule parser + validation | env, feature | Qazi | REQ-CSP | Parses sample; rejects slots < tasks and unknown labels with clear message |
 | 6 | `tools/gen_env.py` random env/schedule generator | test, feature | Ashar | REQ-TEST | Flags for size/obstacles/dirt; modes: reachable, unreachable, feasible, infeasible; seeded |
 | 7 | Test skeletons + fixtures for all modules | test | Ashar | REQ-SRCH, REQ-CSP, REQ-INT | Tests written from spec, initially xfail; fixtures for start==goal, no path, infeasible, unconstrained |
 | 8 | Own `Environment.txt` | env | Qazi | REQ-ENV | ≥8×8, ≥6 obstacles, ≥4 dirty, all reachable, no overlap, ≠ sample |
-| 9 | Own `Schedule.txt` | csp | Huzaifa | REQ-CSP | ≥3 precedence, ≥2 latest-slot, feasible, includes ≥1 unconstrained task |
+| 9 | Own `Schedule.txt` | csp | Qazi | REQ-CSP | ≥3 precedence, ≥2 latest-slot, feasible, includes ≥1 unconstrained task |
 | 10 | Error files `Environment_Error.txt` / `Schedule_Error.txt` | env, test | Qazi | REQ-TEST | Triggers no-path and/or infeasible-schedule path; failure reported cleanly |
 
 ### M1 Search (due 12 Nov)
@@ -261,3 +269,4 @@ All unassigned at creation; owner shown for assignment later. All in milestone s
 
 - 2026-11-08 (#41): milestones rescheduled after M0 and M1 slipped (M2 moves with them) — M0 9 Nov, M1 + M2 12 Nov, M3 15 Nov, M4 20 Nov (official deadline 22 Nov unchanged).
 - Re-approval: dates changed after the 2026-11-02 approval; the team re-approves by approving PR #37.
+- 2026-11-18 (#42): #3, #4, #9 reassigned → Qazi (with #5, #8, #10 Qazi owns `env.py` and `data/`); Ashar = testing + report only (#6, #7, #25, #26, #29, #30, assembles #28). Review approval no longer required on the lead's PRs (CI still required). 2-day schedule added (§6).

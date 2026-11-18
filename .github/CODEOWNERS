@@ -1,22 +1,19 @@
 # Code owners per docs/plan.md §1. Last matching pattern wins.
-# Every path has at least one owner other than its likely PR author, so
-# self-authored PRs stay approvable (Ashar's paths keep his cross-review
-# partner Qazi as second owner; Qazi's paths keep Mujtaba as a third owner).
+# Every path has at least one owner other than its likely PR author.
+# Since 18 Nov (#42) the lead's (Qazi's) PRs need no other member's approval;
+# CI must still be green. Ashar owns tests, generator and report only.
 
 # Default (root config: README, pyproject, requirements, ...): Qazi + Ashar
 *                       @Muhammad-Ahmed-Qazi @MUHAMMAD-ASHAR-KHAN @MujtabaJRao
 
-# env.py: Ashar (env parser) + Qazi (schedule parser) — each approves the other.
-# Huzaifa listed so he is auto-requested: the schedule parser builds the
-# Constraints that csp.py consumes (#5).
-/src/cep/env.py         @MUHAMMAD-ASHAR-KHAN @Muhammad-Ahmed-Qazi @Huzaifa-Hanif-01
+# env.py: Qazi (types, env + schedule parsers: #3, #4, #5). Huzaifa listed so
+# he is auto-requested: the schedule parser builds the Constraints csp.py consumes.
+/src/cep/env.py         @Muhammad-Ahmed-Qazi @Huzaifa-Hanif-01 @MUHAMMAD-ASHAR-KHAN
 
 # Ashar: tests (gen_env.py is set below, after /tools/)
 /tests/                 @MUHAMMAD-ASHAR-KHAN @Muhammad-Ahmed-Qazi
-# data/: Qazi authors own env, error and sample files; Ashar approves.
+# data/: Qazi authors own env + schedule, error and sample files (#8, #9, #10).
 /data/                  @Muhammad-Ahmed-Qazi @MUHAMMAD-ASHAR-KHAN
-# Huzaifa authors own Schedule.txt (#9); Qazi approves.
-/data/Schedule*.txt     @Huzaifa-Hanif-01 @Muhammad-Ahmed-Qazi
 
 # Mujtaba: search
 /src/cep/search.py      @MujtabaJRao
