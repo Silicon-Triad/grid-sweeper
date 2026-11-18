@@ -143,8 +143,8 @@ _CELL_RE = re.compile(r"\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)")
 def _numbered_lines(text: str) -> list[tuple[int, str]]:
     """Split text into ``(line_number, stripped_line)`` pairs.
 
-    Trailing blank lines are dropped; ``splitlines`` also handles Windows (CRLF) line endings
-    (DEC-08).
+    Trailing blank lines are dropped; ``splitlines`` also handles Windows
+    (CRLF) line endings (DEC-08).
 
     Args:
         text: Whole file content.
