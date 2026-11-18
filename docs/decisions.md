@@ -77,3 +77,73 @@ comes from a `spec-question` issue, is labelled `design-decision`, and is
 - **Rationale:** Typos in field names fail at once; immutability stops integration marking cells cleaned on the shared grid (REQ-INT-03 runs repeat per algorithm). Int slots avoid string-order bugs at ≥10 slots/tasks (`"T10" < "T9"`). `select_unassigned_variable` receives no `variables` argument yet needs file order for DEC-05, so `Constraints` carries it. Labels as the schedule match the spec wording "cleaning tasks". Ordered lists and a fixed action order make the schedule and paths found reproducible (testable); raising on an unknown algorithm keeps a typo distinct from "no path" (REQ-INT-07).
 - **Affects REQ-IDs:** REQ-ENV-03, REQ-ENV-06, REQ-ENV-07, REQ-CSP-04, REQ-CSP-13, REQ-SRCH-02, REQ-SRCH-09, REQ-INT-01
 - **Decided by / date:** Qazi, 2026-11-18
+
+### DEC-07 — Input errors: one `InputError(ValueError)` class, first error wins — **DECIDED**
+- **Issue:** #4, #5
+- **Spec reference:** §5.2, §6.3, §6.4 — no error mechanism or message format given.
+- **Question:** Which exception type(s) and message style do the parsers use?
+- **Options considered:** one `InputError(ValueError)`; separate env/schedule classes; plain `ValueError`
+- **Decision:** One class `InputError(ValueError)` in `src/cep/env.py`, raised at the first problem found. Message: `"<source>: line <n>: <problem>"`, naming the offending value (team choice, not a spec value).
+- **Rationale:** Tests (#7) and the error run (#26) can match one type and the line number; subclassing `ValueError` keeps generic handlers working.
+- **Affects REQ-IDs:** REQ-ENV-06, REQ-CSP-08
+- **Decided by / date:** Qazi, 2026-11-18
+
+### DEC-08 — Whitespace tolerance — **DECIDED**
+- **Issue:** #4, #5
+- **Spec reference:** §5.2 / §6.3 give the format by example only (`Environment_Sample.txt`, `Schedule_Sample.txt`).
+- **Question:** Are spaces inside tuples, Windows line endings and trailing blank lines accepted?
+- **Options considered:** strict sample format; tolerant
+- **Decision:** Tolerant: spaces around numbers, commas and parentheses (`( 2 , 3 )`), `\r\n` line endings and trailing blank lines are accepted. Blank lines between items are errors, except the empty tuple line of DEC-09 (team choice, not a spec value).
+- **Rationale:** Hidden assessment files may be hand-typed on any OS; whitespace carries no meaning in the format.
+- **Affects REQ-IDs:** REQ-ENV-02, REQ-CSP-02
+- **Decided by / date:** Qazi, 2026-11-18
+
+### DEC-09 — Tuple line when a count is 0 — **DECIDED**
+- **Issue:** #4, #5
+- **Spec reference:** §5.2 lines 3 and 5; §6.3 items 3 and 5 — the zero case is not shown.
+- **Question:** After a count of 0, is the tuple line empty, missing, or either?
+- **Options considered:** empty line required; line omitted; both accepted
+- **Decision:** Environment: both accepted — after a count of 0, an empty line is consumed as the empty list, otherwise the next line is read as the next item (unambiguous: count lines are never empty). Schedule: a count of 0 means no pair lines follow (team choice, not a spec value).
+- **Rationale:** Either reading of the spec is plausible; accepting both costs one check.
+- **Affects REQ-IDs:** REQ-ENV-02, REQ-CSP-02
+- **Decided by / date:** Qazi, 2026-11-18
+
+### DEC-10 — Tuples per line — **DECIDED**
+- **Issue:** #4, #5
+- **Spec reference:** §5.2 "one item or group of items per line" (sample: all obstacles on one line, `", "`-separated); §6.3 "One pair … per line".
+- **Question:** One line per group, or one tuple per line?
+- **Options considered:** strict per file type; accept both layouts
+- **Decision:** Environment: each tuple group on one line, tuples separated by commas and/or spaces. Schedule: exactly one pair per line (follows the spec wording; layout strictness is a team choice).
+- **Rationale:** Matches the samples; keeps line numbers in errors meaningful and the parser simple to explain.
+- **Affects REQ-IDs:** REQ-ENV-02, REQ-CSP-02
+- **Decided by / date:** Qazi, 2026-11-18
+
+### DEC-11 — Environment value checks — **DECIDED**
+- **Issue:** #4
+- **Spec reference:** §4 ("distinct dirty locations", "No overlap"); §5.2 — limits on values not given.
+- **Question:** How are duplicates, non-positive sizes, negative counts, count mismatches, overlaps, extra lines, zero dirty cells and reachability handled?
+- **Options considered:** reject vs. silently fix / pass on
+- **Decision:** Errors: duplicate cell within obstacles or within dirty cells; rows or cols ≤ 0; negative count; non-integer value (malformed); count ≠ number of tuples (message gives both); cell out of bounds or negative; any overlap among charger, dirty cells and obstacles (message names both roles); non-blank lines after line 6. Allowed: 0 obstacles, 0 dirty cells. Not checked by the parser: reachability — it is a property of our own file (REQ-ENV-09, a test) and a failure `execute_schedule` reports (§7.1 item 6) (team choice, not a spec value).
+- **Rationale:** Duplicate dirty cells would give two labels one cell; duplicate obstacles are harmless but almost certainly typos. Leaving reachability to search keeps "unreachable" a demonstrable runtime failure.
+- **Affects REQ-IDs:** REQ-ENV-02, REQ-ENV-06
+- **Decided by / date:** Qazi, 2026-11-18
+
+### DEC-12 — Schedule value checks — **DECIDED**
+- **Issue:** #5
+- **Spec reference:** §6.3, §6.4 — duplicates, slot ranges, self-precedence and slot spelling not covered.
+- **Question:** How are duplicate constraints, out-of-range latest slots, `(X,X)`, slot spelling, label case and extra lines handled?
+- **Options considered:** reject vs. pass to the CSP solver; `T3` and/or `3`
+- **Decision:** Exact duplicate precedence pair: allowed (kept once). Two latest-slot entries for one task: error. Latest slot < 1 or > num_slots: error. `(X,X)` and precedence cycles: accepted — the solver reports no feasible schedule (REQ-CSP-12). Slots accepted as `T3` (sample) or `3`, stored as int. Labels case-sensitive `D<n>`; a label not in the grid is an error naming it (REQ-CSP-08). Non-blank lines after the last pair: error (team choice, not a spec value).
+- **Rationale:** Malformed references are input errors; well-formed but unsatisfiable constraints are infeasibility, which the error run must show the solver detecting.
+- **Affects REQ-IDs:** REQ-CSP-02, REQ-CSP-08, REQ-CSP-12
+- **Decided by / date:** Qazi, 2026-11-18
+
+### DEC-13 — Text parsers alongside file loaders — **DECIDED**
+- **Issue:** #4, #5
+- **Spec reference:** §5.2, §6.3 require loading from files; function names not given.
+- **Question:** Parse only from files, or also from text?
+- **Options considered:** `load_*` only; `load_*` + `parse_*`
+- **Decision:** `parse_environment(text, source)` / `parse_schedule(text, grid, source)` do the work; `load_environment(path)` / `load_schedule(path, grid)` read the file and pass its name as `source` for error messages (team choice).
+- **Rationale:** Tests can use inline strings; file reading stays one line.
+- **Affects REQ-IDs:** REQ-ENV-01, REQ-CSP-01
+- **Decided by / date:** Qazi, 2026-11-18
