@@ -34,11 +34,14 @@ choices where the spec is silent, except ``State`` (spec §5.3):
     - ``ACTIONS``: ``UP, DOWN, LEFT, RIGHT`` with their row/column deltas.
     - ``ALGORITHMS``: ``"ucs"``, ``"astar"`` (DEC-01).
     - ``Grid``, ``Constraints``: frozen dataclasses below.
-Parsers and validation are added by issues #4 and #5.
+Environment parsing: issue #4 (rules DEC-07 to DEC-11, DEC-13). Schedule parsing: #5.
 """
 
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass
+from pathlib import Path
+from types import MappingProxyType
 
 State = tuple[int, int]
 Label = str
@@ -122,3 +125,240 @@ def initial_domains(constraints: Constraints) -> dict[Label, list[Slot]]:
         Mapping from every variable to ``[1, …, num_slots]``.
     """
     return {v: list(range(1, constraints.num_slots + 1)) for v in constraints.variables}
+
+
+class InputError(ValueError):
+    """Invalid Environment.txt or Schedule.txt content (DEC-07).
+
+    One class for both files so callers and tests catch a single type. The
+    message always starts with ``"<source>: line <n>:"``.
+    """
+
+
+# One "(row,col)" tuple. "-?" lets a negative number parse so the error can
+# say "outside the grid" rather than the vaguer "malformed" (DEC-11).
+_CELL_RE = re.compile(r"\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)")
+
+
+def _numbered_lines(text: str) -> list[tuple[int, str]]:
+    """Split text into ``(line_number, stripped_line)`` pairs.
+
+    Trailing blank lines are dropped; ``splitlines`` also handles ``\\r\\n``
+    (DEC-08).
+
+    Args:
+        text: Whole file content.
+
+    Returns:
+        1-based line numbers paired with whitespace-stripped lines.
+    """
+    lines = [(i, line.strip()) for i, line in enumerate(text.splitlines(), start=1)]
+    while lines and not lines[-1][1]:
+        lines.pop()
+    return lines
+
+
+class _LineReader:
+    """Hands out lines one at a time and builds located error messages."""
+
+    def __init__(self, text: str, source: str) -> None:
+        """Prepare to read ``text``.
+
+        Args:
+            text: Whole file content.
+            source: Name used in error messages (usually the file name).
+        """
+        self.lines = _numbered_lines(text)
+        self.pos = 0
+        self.source = source
+
+    def error(self, lineno: int, problem: str) -> InputError:
+        """Build an InputError in the DEC-07 format.
+
+        Args:
+            lineno: 1-based line number the problem is on.
+            problem: What is wrong, naming the bad value.
+
+        Returns:
+            The exception (the caller raises it).
+        """
+        return InputError(f"{self.source}: line {lineno}: {problem}")
+
+    def next(self, what: str) -> tuple[int, str]:
+        """Return the next line; blank lines between items are errors (DEC-08).
+
+        Args:
+            what: Description of the expected item, for the error message.
+
+        Returns:
+            ``(line_number, stripped_line)``.
+
+        Raises:
+            InputError: If the file ended or the line is blank.
+        """
+        if self.pos >= len(self.lines):
+            last = self.lines[-1][0] if self.lines else 0
+            raise self.error(last + 1, f"missing {what} (file ended)")
+        lineno, line = self.lines[self.pos]
+        self.pos += 1
+        if not line:
+            raise self.error(lineno, f"expected {what}, found a blank line")
+        return lineno, line
+
+    def skip_empty_line(self) -> None:
+        """Consume one blank line if it is next (empty tuple line, DEC-09)."""
+        if self.pos < len(self.lines) and not self.lines[self.pos][1]:
+            self.pos += 1
+
+    def expect_end(self) -> None:
+        """Raise if any line is left over (DEC-11, DEC-12).
+
+        Raises:
+            InputError: On the first unexpected line.
+        """
+        if self.pos < len(self.lines):
+            lineno, line = self.lines[self.pos]
+            raise self.error(lineno, f"unexpected extra line {line!r}")
+
+
+def _parse_count(reader: _LineReader, what: str) -> int:
+    """Read a line holding one non-negative integer.
+
+    Args:
+        reader: Line source.
+        what: Name of the count, for error messages.
+
+    Returns:
+        The count.
+
+    Raises:
+        InputError: If the line is not a non-negative integer (DEC-11).
+    """
+    lineno, line = reader.next(what)
+    if not re.fullmatch(r"\d+", line):
+        raise reader.error(
+            lineno, f"{what} must be a non-negative integer, got {line!r}"
+        )
+    return int(line)
+
+
+def _parse_cells(line: str) -> list[State] | None:
+    """Parse a line of ``(row,col)`` tuples separated by commas/spaces (DEC-10).
+
+    Args:
+        line: Stripped line, possibly empty.
+
+    Returns:
+        Cells in line order, or None if anything besides tuples, commas and
+        spaces is on the line.
+    """
+    # Whatever is left after removing the tuples must only be separators.
+    leftover = _CELL_RE.sub(" ", line)
+    if leftover.replace(",", " ").strip():
+        return None
+    return [(int(r), int(c)) for r, c in _CELL_RE.findall(line)]
+
+
+def parse_environment(text: str, source: str = "Environment.txt") -> Grid:
+    """Parse Environment.txt content into a Grid (spec §5.2, REQ-ENV-02).
+
+    Format, one item or group per line: ``rows,cols``; obstacle count;
+    obstacle tuples; dirty count; dirty tuples; charger tuple. Validation rules
+    are DEC-07 to DEC-11.
+
+    Args:
+        text: Whole file content.
+        source: Name used in error messages.
+
+    Returns:
+        The validated Grid; dirty labels D1…Dn in file order (REQ-ENV-04).
+
+    Raises:
+        InputError: On the first format or validation problem found.
+    """
+    reader = _LineReader(text, source)
+
+    lineno, line = reader.next("grid dimensions 'rows,cols'")
+    match = re.fullmatch(r"(\d+)\s*,\s*(\d+)", line)
+    if not match:
+        raise reader.error(lineno, f"grid dimensions must be 'rows,cols', got {line!r}")
+    rows, cols = int(match[1]), int(match[2])
+    if rows <= 0 or cols <= 0:
+        raise reader.error(
+            lineno, f"grid dimensions must be positive, got {rows}x{cols}"
+        )
+
+    # cell -> (role, line it came from); used for the overlap check (§4).
+    seen: dict[State, tuple[str, int]] = {}
+
+    def read_cells(what: str, count: int) -> list[State]:
+        """Read one tuple line of exactly ``count`` distinct in-bounds cells."""
+        if count == 0:
+            reader.skip_empty_line()  # DEC-09: empty line or none at all
+            return []
+        lineno, line = reader.next(f"{what} coordinates")
+        cells = _parse_cells(line)
+        if cells is None:
+            raise reader.error(lineno, f"malformed {what} coordinates {line!r}")
+        if len(cells) != count:
+            raise reader.error(
+                lineno, f"expected {count} {what} cells, found {len(cells)}"
+            )
+        for cell in cells:
+            check_cell(cell, what, lineno)
+        return cells
+
+    def check_cell(cell: State, what: str, lineno: int) -> None:
+        """Reject out-of-bounds, duplicate and overlapping cells (DEC-11)."""
+        r, c = cell
+        if not (0 <= r < rows and 0 <= c < cols):
+            raise reader.error(lineno, f"{what} cell {cell} outside {rows}x{cols} grid")
+        if cell in seen:
+            other, other_line = seen[cell]
+            if other == what:
+                raise reader.error(lineno, f"duplicate {what} cell {cell}")
+            raise reader.error(
+                lineno, f"{what} cell {cell} overlaps {other} cell (line {other_line})"
+            )
+        seen[cell] = (what, lineno)
+
+    obstacles = read_cells("obstacle", _parse_count(reader, "obstacle count"))
+    dirty_cells = read_cells("dirty", _parse_count(reader, "dirty count"))
+
+    lineno, line = reader.next("charging station coordinate")
+    charger_cells = _parse_cells(line)
+    if charger_cells is None or len(charger_cells) != 1:
+        raise reader.error(
+            lineno, f"charging station must be one (row,col) tuple, got {line!r}"
+        )
+    charger = charger_cells[0]
+    check_cell(charger, "charging station", lineno)
+
+    reader.expect_end()
+
+    # D1…Dn in file order (REQ-ENV-04); dicts keep insertion order.
+    dirty = {f"D{i}": cell for i, cell in enumerate(dirty_cells, start=1)}
+    return Grid(
+        rows=rows,
+        cols=cols,
+        obstacles=frozenset(obstacles),
+        dirty=MappingProxyType(dirty),
+        charger=charger,
+    )
+
+
+def load_environment(path: str | Path) -> Grid:
+    """Load and validate an Environment.txt file (REQ-ENV-01).
+
+    Args:
+        path: File to read; supplied by the caller, never hardcoded.
+
+    Returns:
+        The validated Grid.
+
+    Raises:
+        InputError: If the content is invalid (message names the file).
+        OSError: If the file cannot be read.
+    """
+    path = Path(path)
+    return parse_environment(path.read_text(encoding="utf-8"), source=path.name)
