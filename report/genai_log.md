@@ -11,3 +11,4 @@ report's "Generative AI Use Declaration" (spec §8.2).
 | 2026-11-02 | Qazi | Claude Code (Claude Opus 5.5) | Reassign #5, #8, #10 Ashar → Qazi in plan.md / CODEOWNERS / AGENTS.md / issues | #5 #8 #10 |
 | 2026-11-08 | Qazi | Claude Code (Claude Opus 5.5) | Fix Ashar's username in CODEOWNERS / AGENTS.md / plan.md | #35 |
 | 2026-11-08 | Qazi | Claude Code (Claude Opus 5.5) | Address review on #34: Schedule*.txt + env.py owners, dedupe gen_env rule, plan rubric column, open items, model names in this log | #34 |
+| 2026-11-08 | Qazi | Claude Code (Claude Opus 5.5) | Reschedule milestones (GitHub + plan.md); address review on #37 | #41 |
