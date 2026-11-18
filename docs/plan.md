@@ -27,10 +27,10 @@ Notebook filename: `CS24045.ipynb`.
 
 ## 2. AI policy (summary — full rules in `AGENTS.md`)
 
-- **AI may:** write/edit `docs/` (except `docs/spec/`), `.github/`, `tools/ci_local.sh`, `tools/build_notebook.py`; create issues, labels, milestones; write PR descriptions; review PRs; run tests and report results.
-- **AI may not:** author or edit `src/`, `tests/`, `tools/gen_env.py`, `data/`, solution cells of the notebook, or report prose. Review comments may point at bugs; a human writes the fix.
-- **Enforced by:** CI job `ai-boundary` (fails if any commit carrying an AI `Co-Authored-By` trailer touches forbidden paths) + PR template field "Model used".
-- **One exception:** the scaffold commit (#1) may create `src/cep/*.py` stubs containing only the frozen signatures, docstrings quoting the spec, and `raise NotImplementedError`. `tests/` and `data/` get `.gitkeep` only. `ai-boundary` is enforced from the commit after the scaffold.
+- **AI may:** author or edit any path except `docs/spec/` — including `src/`, `tests/`, `tools/`, `data/`, notebook cells and report material; create issues, labels, milestones; write PR descriptions; review PRs; run tests and report results. (Restriction on AI-authored code lifted 2026-11-18, #44.)
+- **AI must:** stay inside the assigned issue; no mass refactors; never invent values the spec doesn't give (open a `spec-question`); run `tools/ci_local.sh` before claiming done; state the model in the PR; mark commits with a `Co-Authored-By` trailer.
+- **Humans must:** be able to explain every line of an AI-authored PR they open or merge (C6 is graded individually at the viva); declare AI-written report prose.
+- **Enforced by:** CI job `ai-boundary` (fails if any commit carrying an AI `Co-Authored-By` trailer touches `docs/spec/`) + `spec-frozen` + PR template field "Model used".
 - Every AI use is logged in `report/genai_log.md` → feeds the report's GenAI declaration.
 
 ---
@@ -188,7 +188,7 @@ Parallelism: after #3 + #4 + #5 land (9 Nov), search (M1, needs #4) and CSP (M2,
 | `interface` | AST check: frozen signatures in `src/cep/` match §4 |
 | `notebook` | `build_notebook.py --check` (committed notebook == rebuilt) + `pytest --nbmake notebook/` |
 | `traceability` | PR body contains ≥1 `REQ-` ID and a "Model used" line |
-| `ai-boundary` | Fails if a commit with AI `Co-Authored-By` trailer touches forbidden paths (§2) |
+| `ai-boundary` | Fails if a commit with AI `Co-Authored-By` trailer touches `docs/spec/` (§2) |
 | `spec-frozen` | `docs/spec/` matches `SHA256SUMS` |
 
 `tools/ci_local.sh` runs the same set (minus `traceability`).
@@ -270,3 +270,4 @@ All unassigned at creation; owner shown for assignment later. All in milestone s
 - 2026-11-08 (#41): milestones rescheduled after M0 and M1 slipped (M2 moves with them) — M0 9 Nov, M1 + M2 12 Nov, M3 15 Nov, M4 20 Nov (official deadline 22 Nov unchanged).
 - Re-approval: dates changed after the 2026-11-02 approval; the team re-approves by approving PR #37.
 - 2026-11-18 (#42): #3, #4, #9 reassigned → Qazi (with #5, #8, #10 Qazi owns `env.py` and `data/`); Ashar = testing + report only (#6, #7, #25, #26, #29, #30, assembles #28). Review approval no longer required on the lead's PRs (CI still required). 2-day schedule added (§6).
+- 2026-11-18 (#44): AI code-authoring restriction lifted by team decision (time pressure).

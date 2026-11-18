@@ -14,6 +14,7 @@ tools/ci_local.sh
 ```
 
 **Model used:** <!-- none | <model name> (for: <what it was used for>) -->
+<!-- AI-authored code: the person opening/merging must be able to explain every line at the viva. -->
 
 ## Done checklist
 - [ ] Cites issue + REQ-IDs
@@ -22,3 +23,4 @@ tools/ci_local.sh
 - [ ] No hardcoded paths/coordinates outside `data/` and `tests/fixtures/`
 - [ ] Frozen interfaces unchanged (or `frozen-interface` issue approved)
 - [ ] "Model used" field filled; AI use logged in `report/genai_log.md`
+- [ ] If AI wrote code: I can explain every line (viva, C6)
