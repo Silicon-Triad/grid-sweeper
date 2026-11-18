@@ -94,10 +94,10 @@ execute_schedule(grid, charging_station, schedule, algorithm) -> (complete_path,
 | Type | Definition | Used by |
 |---|---|---|
 | `state` | `tuple[int, int]` = `(row, col)`, zero-based, top-left `(0,0)` (REQ-ENV-03) | search, integrate |
-| action | one of `"UP"`, `"DOWN"`, `"LEFT"`, `"RIGHT"` (REQ-SRCH-02) | search |
+| action | string from `ACTIONS` = `UP, DOWN, LEFT, RIGHT` with `(dr, dc)`; this order = successor order = UCS/A* tie-break (REQ-SRCH-02) | search |
 | task label | `str` `"D1"…"Dn"`, numbered in file order (REQ-ENV-04) | env, csp, integrate |
 | slot | `int` `1…n`; shown as `T<n>` only in output. Never compare labels/slots as strings (`"T10" < "T9"`). | csp, integrate, render |
-| algorithm | `"ucs"` or `"astar"` (DEC-01) | search, integrate |
+| algorithm | `ALGORITHMS` = `"ucs"`, `"astar"` (DEC-01); any other name → `search` raises `ValueError` | search, integrate |
 
 **`Grid`** — frozen dataclass (immutable; integration tracks cleaned cells itself):
 
@@ -105,7 +105,7 @@ execute_schedule(grid, charging_station, schedule, algorithm) -> (complete_path,
 |---|---|---|
 | `rows`, `cols` | `int` | grid dimensions (line 1) |
 | `obstacles` | `frozenset[state]` | blocked cells (line 3) |
-| `dirty` | `dict[str, state]`, insertion order = file order | label → cell (line 5) |
+| `dirty` | read-only `Mapping[str, state]` (`MappingProxyType`), file order | label → cell (line 5) |
 | `charger` | `state` | charging station (line 6) |
 
 Free cells = in-bounds cells not in `obstacles`; dirty and charger cells are
@@ -118,10 +118,10 @@ passable. `get_successors` excludes only out-of-bounds and obstacle cells.
 | `variables` | `tuple[str, ...]` | all task labels in file order (from `Grid.dirty`), incl. unconstrained (REQ-CSP-03); DEC-05 tie-break order |
 | `num_slots` | `int` | available slots (line 1) |
 | `precedence` | `tuple[tuple[str, str], ...]` | `(before, after)` pairs (REQ-CSP-05) |
-| `latest` | `dict[str, int]` | label → latest slot (REQ-CSP-06) |
+| `latest` | read-only `Mapping[str, int]` (`MappingProxyType`) | label → latest slot (REQ-CSP-06) |
 
-Slot exclusivity is implicit (REQ-CSP-07). Initial `domains`: `dict[str, set[int]]`,
-every variable → `{1…num_slots}` (REQ-CSP-04). `assignment`: `dict[str, int]`.
+Slot exclusivity is implicit (REQ-CSP-07). Initial `domains` = `initial_domains(constraints)`:
+`dict[str, list[int]]`, every variable → `[1…num_slots]` ascending (REQ-CSP-04). `assignment`: `dict[str, int]`.
 `execute_schedule`'s `schedule`: `list[str]` of labels in slot order; it converts
 them to cells via `grid.dirty`.
 
