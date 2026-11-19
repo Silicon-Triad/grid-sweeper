@@ -19,3 +19,4 @@ report's "Generative AI Use Declaration" (spec §8.2).
 | 2026-11-18 | Qazi | Claude Code (Claude Opus 5.5) | Authored parse_schedule/load_schedule in src/cep/env.py (rules DEC-07–DEC-10, DEC-12, DEC-13) | #5 |
 | 2026-11-18 | Qazi | Claude Code (Claude Opus 5.5) | Found and fixed tools/ci_local.sh ignoring set -e inside jobs (lint passed with ruff errors); added to PR #48 at Qazi's request | #5 |
 | 2026-11-18 | Qazi | Claude Code (Claude Opus 5.5) | Designed + verified own Environment.txt/Schedule.txt and Environment_Error.txt/Schedule_Error.txt (unreachable D5); throwaway BFS + brute-force checks, not committed | #8 #9 #10 |
+| 2026-11-19 | Huzaifa | Claude Code (Claude Opus 5.5) | Authored CSP solver in src/cep/csp.py (is_consistent, MRV+degree per DEC-05, forward checking with copy-based restoration, LCV, backtracking) and tests/test_csp.py (incl. brute-force oracle) | #17 #18 #19 #20 #21 |
