@@ -20,3 +20,4 @@ report's "Generative AI Use Declaration" (spec §8.2).
 | 2026-11-18 | Qazi | Claude Code (Claude Opus 5.5) | Found and fixed tools/ci_local.sh ignoring set -e inside jobs (lint passed with ruff errors); added to PR #48 at Qazi's request | #5 |
 | 2026-11-18 | Qazi | Claude Code (Claude Opus 5.5) | Designed + verified own Environment.txt/Schedule.txt and Environment_Error.txt/Schedule_Error.txt (unreachable D5); throwaway BFS + brute-force checks, not committed | #8 #9 #10 |
 | 2026-11-19 | Mujtaba | Claude Code (Claude Opus 5.5) | Authored get_successors/goal_test/path_cost/heuristic and UCS/A* search (shared priority queue, start==goal, no path) in src/cep/search.py + tests/test_search.py | #11 #12 #13 #14 |
+| 2026-11-19 | Mujtaba | Claude Code (Claude Opus 5.5) | Drafted spec-question on how nodes_expanded is counted (options A/B/C, proposed DEC-14) | #51 |
