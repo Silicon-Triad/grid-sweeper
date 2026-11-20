@@ -1,10 +1,7 @@
-
 from pathlib import Path
 
 import pytest
-
-from src.cep.env import InputError, parse_environment, load_environment
-
+from src.cep.env import InputError, parse_environment
 
 SAMPLE_ENV = """4,4
 2
