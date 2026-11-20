@@ -130,3 +130,42 @@ def test_env_zero_obstacles_and_dirty():
 
     assert len(grid.obstacles) == 0
     assert len(grid.dirty) == 0
+
+
+def test_env_own_minimums():
+    env_path = Path(__file__).resolve().parent.parent / "Environment.txt"
+    grid = parse_environment(env_path.read_text(encoding="utf-8"))
+
+    assert grid.rows >= 8
+    assert grid.cols >= 8
+    assert len(grid.obstacles) >= 6
+    assert len(grid.dirty) >= 4
+
+
+def test_env_own_reachable():
+    from collections import deque
+
+    env_path = Path(__file__).resolve().parent.parent / "Environment.txt"
+    grid = parse_environment(env_path.read_text(encoding="utf-8"))
+
+    start = grid.charger
+    visited = {start}
+    queue = deque([start])
+
+    while queue:
+        row, col = queue.popleft()
+
+        for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            next_cell = (row + dr, col + dc)
+
+            if (
+                0 <= next_cell[0] < grid.rows
+                and 0 <= next_cell[1] < grid.cols
+                and next_cell not in grid.obstacles
+                and next_cell not in visited
+            ):
+                visited.add(next_cell)
+                queue.append(next_cell)
+
+    for dirty_position in grid.dirty.values():
+        assert dirty_position in visited
