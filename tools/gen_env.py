@@ -66,7 +66,8 @@ def make_environment(rng, rows, cols, obstacle_count, dirt_count, unreachable):
             )
 
         available = [
-            cell for cell in cells
+            cell
+            for cell in cells
             if cell not in blocked and cell not in {charger, target}
         ]
         other_dirt = rng.sample(available, dirt_count - 1)
@@ -92,14 +93,19 @@ def make_environment(rng, rows, cols, obstacle_count, dirt_count, unreachable):
                 "or a larger grid."
             )
 
-    return "\n".join([
-        f"{rows},{cols}",
-        str(len(obstacles)),
-        ", ".join(map(str, sorted(obstacles))),
-        str(len(dirty)),
-        ", ".join(map(str, dirty)),
-        str(charger),
-    ]) + "\n"
+    return (
+        "\n".join(
+            [
+                f"{rows},{cols}",
+                str(len(obstacles)),
+                ", ".join(map(str, sorted(obstacles))),
+                str(len(dirty)),
+                ", ".join(map(str, dirty)),
+                str(charger),
+            ]
+        )
+        + "\n"
+    )
 
 
 def make_schedule(rng, dirt_count, infeasible):
@@ -166,12 +172,14 @@ def main():
     rng = random.Random(args.seed)
 
     environment = make_environment(
-        rng, rows, cols, args.obstacles, args.dirt,
+        rng,
+        rows,
+        cols,
+        args.obstacles,
+        args.dirt,
         args.mode == "unreachable",
     )
-    schedule = make_schedule(
-        rng, args.dirt, args.mode == "infeasible"
-    )
+    schedule = make_schedule(rng, args.dirt, args.mode == "infeasible")
 
     grid = parse_environment(environment, source="generated Environment.txt")
     parse_schedule(schedule, grid, source="generated Schedule.txt")
