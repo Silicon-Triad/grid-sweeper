@@ -1,0 +1,63 @@
+% !TEX root = ../main.tex
+\section{Graph-Based Search Algorithms}
+
+We implemented Uniform-Cost Search (uninformed) and \astar{} (informed) (\dec{01}). Both are one
+best-first \textbf{graph search} in \code{search(grid, start, goal, algorithm)}; they differ only in
+the priority:
+\begin{itemize}
+  \item \textbf{UCS} expands the frontier node with the lowest path cost $g(n)$. With non-negative
+    step costs, it is complete and optimal: when a node is removed from the frontier, its cheapest
+    path is known.
+  \item \textbf{\astar} expands the node with the lowest $f(n) = g(n) + h(n)$, where $h$ estimates
+    the remaining cost. With a consistent $h$ it is complete and optimal, and it expands no node
+    with $f > C^*$ (the optimal cost). This is why it usually expands fewer nodes than UCS.
+\end{itemize}
+
+Shared implementation details: a binary heap is the frontier. Ties are broken by insertion order,
+so results are deterministic. A node is goal-tested when it is \emph{popped}, not when it is
+generated, because testing on generation can return a non-optimal path. A \code{closed} set ensures
+each cell is expanded at most once. A node counts as expanded when its successors are generated
+(\dec{14}). \code{search} returns \code{(path, cost, nodes\_expanded)}, or
+\code{(None, None, nodes\_expanded)} when no path exists; for start $=$ goal it returns
+\code{([start], 0, 0)}. An unknown algorithm name raises \code{ValueError}.
+
+\begin{algorithm}[H]
+\caption{Best-first graph search shared by UCS and \astar}
+\begin{algorithmic}[1]
+\Function{Search}{$grid, start, goal, algorithm$}
+  \State $priority(n, g) \gets g + h(n, goal)$ \textbf{if} $algorithm = $ \astar{} \textbf{else} $g$ \Comment{UCS: $h \equiv 0$}
+  \State $frontier \gets$ heap $\{(priority(start,0), start)\}$; \ $best\_g[start] \gets 0$
+  \State $parent[start] \gets \textit{none}$; \ $closed \gets \emptyset$; \ $expanded \gets 0$
+  \While{$frontier \neq \emptyset$}
+    \State $n \gets$ pop lowest priority (FIFO among ties)
+    \If{$n \in closed$} \textbf{continue} \Comment{stale duplicate entry}
+    \EndIf
+    \If{\Call{Goal-Test}{$n, goal$}}
+      \State \Return $(\Call{Path}{parent, n},\ best\_g[n],\ expanded)$
+    \EndIf
+    \State $closed \gets closed \cup \{n\}$; \ $expanded \gets expanded + 1$
+    \For{$(m, action, step) \in \Call{Get-Successors}{n, grid}$} \Comment{UP, DOWN, LEFT, RIGHT}
+      \State $g \gets best\_g[n] + step$
+      \If{$m \notin closed$ \textbf{and} $g < best\_g.\mathrm{get}(m, \infty)$}
+        \State $best\_g[m] \gets g$; \ $parent[m] \gets n$
+        \State push $(priority(m, g), m)$ onto $frontier$
+      \EndIf
+    \EndFor
+  \EndWhile
+  \State \Return $(\textit{None}, \textit{None}, expanded)$ \Comment{goal unreachable}
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+UCS is this procedure with $h \equiv 0$. \astar{} uses \code{heuristic(state, goal\_state)}.
+
+\textbf{Heuristic choice.} For \astar{} we use Manhattan distance,
+$h(n) = |row_n - row_{goal}| + |col_n - col_{goal}|$ (spec §5.5; \dec{02}). It is admissible:
+each move is UP, DOWN, LEFT or RIGHT at cost 1, so one move reduces the Manhattan distance by at
+most 1, and obstacles can only lengthen the real path. Hence $h(n)$ never exceeds the true remaining
+cost. It is also consistent: for any move from $n$ to a neighbour $n'$, $h(n) \le 1 + h(n')$, and
+$h(goal) = 0$. Because our \astar{} is a graph search with an explored set, consistency guarantees
+that each cell is expanded first along a cheapest path. So \astar{} returns an optimal path with the
+same cost as UCS, without reopening cells. Among admissible options it is the most informed:
+Euclidean distance and $h = 0$ are never larger, so they would make \astar{} expand more nodes, and
+$h = 0$ reduces \astar{} to UCS.

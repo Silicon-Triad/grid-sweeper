@@ -1,0 +1,33 @@
+% CS-323 AI CEP report. Build: tectonic main.tex  (copy main.pdf to ../CS24045.pdf)
+\documentclass[11pt]{article}
+\input{preamble}
+
+\begin{document}
+
+% Page 1: the grading rubric with all four members filled in serves as the title
+% page; no other title page (spec §8.2, REQ-RPT-10). Regenerate: tools/fill_rubric.py
+\includepdf[pages=1,fitpaper]{figures/rubric_filled.pdf}
+
+\setcounter{page}{2}
+{\centering
+{\fontsize{14}{17}\selectfont\bfseries Intelligent Vacuum-Cleaning Robot: Graph Search and CSP Scheduling\par}
+\vspace{2pt}
+CS-323 Artificial Intelligence, Complex Engineering Problem, TE Batch 2024, Fall 2026\\
+Muhammad Ashar Khan (CS-24035), Huzaifa Hanif (CS-24039), Muhammad Ahmed Qazi (CS-24045),
+Mujtaba Jawaid Rao (CS-24047). Notebook: \code{CS24045.ipynb}\par}
+\vspace{6pt}
+
+Design choices the specification leaves open are team decisions, recorded in our decision log
+as \dec{01}--\dec{15}. They are cited by ID below and are not part of the specification.
+
+\input{chapters/01_problem}
+\input{chapters/02_search}
+\input{chapters/03_csp}
+\input{chapters/04_integration}
+\input{chapters/05_results}
+\input{chapters/06_testing}
+\input{chapters/07_discussion}
+\input{chapters/08_references}
+\input{chapters/09_genai}
+
+\end{document}

@@ -1,0 +1,70 @@
+% !TEX root = ../main.tex
+\section{CSP Formulation and Implementation}
+
+The formulation (variables, domains, three constraint types) is given in Section~1.
+\code{Constraints} stores \code{variables} (file order), \code{num\_slots}, \code{precedence} pairs
+and the \code{latest} map. Initial domains are $[1,\dots,T]$ for every variable. Before search
+starts, \code{backtracking\_search} applies the unary latest-slot constraint to each domain (node
+consistency). If any domain becomes empty, it returns \code{None} at once.
+
+\textbf{The five required functions.}
+\begin{itemize}
+  \item \code{select\_unassigned\_variable} applies \textbf{MRV}: it picks the unassigned variable
+    with the smallest current domain. Ties are broken by the \textbf{degree heuristic}: more
+    \emph{distinct other unassigned variables} linked by a precedence constraint wins. Exclusivity
+    links every pair equally, so it is not counted. Ties left after that go to file order
+    D1\dots Dn (\dec{05}).
+  \item \code{order\_domain\_values} applies \textbf{LCV} (optional in the spec, implemented). It
+    sorts the variable's slots by how many values they would remove from the domains of other
+    unassigned variables, fewest first. Python's stable sort keeps ascending slot order among ties.
+  \item \code{is\_consistent} checks the proposed value against the latest-slot limit and against
+    every \emph{already assigned} variable: no shared slot (exclusivity) and correct order for any
+    precedence pair between them. Constraints with unassigned variables are left for forward
+    checking.
+  \item \code{forward\_check} copies the domains and, for each unassigned variable, removes every
+    slot that would clash with the new assignment (same slot, or wrong side of a precedence pair).
+    It returns the pruned copy, or \code{None} if some domain becomes empty (a dead end found early).
+  \item \code{backtracking\_search} runs the recursive search below and returns a complete
+    assignment, or \code{None} if no feasible schedule exists.
+\end{itemize}
+
+\textbf{Restoration.} \code{forward\_check} never changes the domains it is given; it works on a
+copy. When a value fails, the recursion simply continues with the parent's unchanged domains. So
+every value removed by forward checking is automatically ``restored'' on backtracking, and no undo
+log is needed.
+
+\begin{algorithm}[H]
+\caption{Backtracking search with MRV, degree, LCV and forward checking}
+\begin{algorithmic}[1]
+\Function{Backtrack}{$assignment, domains, C$}
+  \State $X \gets \Call{Select-Unassigned-Variable}{assignment, domains, C}$ \Comment{MRV, degree, file order}
+  \If{$X = \textit{none}$} \Return copy of $assignment$ \Comment{all tasks scheduled}
+  \EndIf
+  \For{$v \in \Call{Order-Domain-Values}{X, assignment, domains, C}$} \Comment{LCV}
+    \If{\textbf{not} \Call{Is-Consistent}{$X, v, assignment, C$}} \textbf{continue}
+    \EndIf
+    \State $assignment[X] \gets v$
+    \State $pruned \gets \Call{Forward-Check}{X, v, assignment, domains, C}$ \Comment{works on a copy}
+    \If{$pruned \neq \textit{None}$}
+      \State $result \gets \Call{Backtrack}{assignment, pruned, C}$
+      \If{$result \neq \textit{None}$} \Return $result$
+      \EndIf
+    \EndIf
+    \State remove $X$ from $assignment$ \Comment{$domains$ unchanged $=$ restored}
+  \EndFor
+  \State \Return \textit{None}
+\EndFunction
+\Statex
+\Function{Backtracking-Search}{$variables, domains, C$}
+  \State $domains \gets$ each domain filtered by its latest-slot limit
+  \If{some domain is empty} \Return \textit{None}
+  \EndIf
+  \State \Return \Call{Backtrack}{$\{\}, domains, C$}
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+On the sample files, the latest-slot filter leaves D2 and D3 with domain $\{1,2,3\}$. They tie on
+MRV and on degree (one precedence neighbour each), so file order picks D2, and LCV places it in T1.
+The resulting schedule is D2$\to$T1, D1$\to$T2, D3$\to$T3, D4$\to$T4. The notebook prints each
+schedule together with a check of every constraint (Figures~\ref{fig:run1}--\ref{fig:run3}).

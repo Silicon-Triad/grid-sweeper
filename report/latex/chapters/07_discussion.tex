@@ -1,0 +1,40 @@
+% !TEX root = ../main.tex
+\section{Discussion and Improvements}
+
+\textbf{Correctness, completeness and optimality.} The grid is finite and every graph search keeps a
+closed set, so UCS and \astar{} are complete: each returns a path if one exists and reports failure
+otherwise (test run 3). With unit step costs, UCS is optimal. \astar{} with consistent Manhattan
+distance is optimal and never needs to reopen a cell. Every run in Section~5 confirmed equal costs.
+The backtracking CSP solver is complete: forward checking only removes values that cannot appear in
+any solution extending the current assignment. So if a schedule exists it is found, and otherwise
+\code{None} is returned. The brute-force comparison in the test suite confirms this on small
+instances.
+
+\textbf{Performance.} \astar{} never did worse than UCS in nodes expanded. Its saving ranges from
+none on open, symmetric layouts to linear-versus-quadratic on corridor-like routes. The CSP
+instances are tiny; with MRV $+$ degree, LCV and forward checking, the sample and our schedule are
+solved without backtracking.
+
+\textbf{Limitations.}
+\begin{itemize}
+  \item The visiting order is fixed by the slot order. The robot's total route is therefore optimal
+    \emph{for that schedule}, not the shortest tour over all feasible schedules.
+  \item One unreachable task stops the whole run (\dec{15}). Later reachable tasks are not
+    attempted, and the robot is not returned to the charger.
+  \item Movement is 4-directional with unit cost. There is no battery, time-per-move, or
+    dynamic-obstacle model.
+  \item Paths are recomputed for every leg and every algorithm. There is no caching of distances.
+\end{itemize}
+
+\textbf{Improvements.}
+\begin{itemize}
+  \item Choose among feasible schedules by route length: compute pairwise distances between all
+    stops with search, then minimise the tour cost subject to the CSP constraints (for example,
+    branch and bound over the CSP solutions).
+  \item On an unreachable task, skip it, continue with the remaining reachable tasks, and return to
+    the charger, then report partial success.
+  \item Use stronger propagation (AC-3) or detect precedence cycles before search, for larger
+    schedules.
+  \item Tie-break \astar{} on larger $g$ among equal $f$, which reduces expansions on open grids
+    where many cells tie (the corner case in Table~2).
+\end{itemize}

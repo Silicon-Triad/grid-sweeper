@@ -1,0 +1,53 @@
+% !TEX root = ../main.tex
+\section{Problem Definition and Representation}
+
+A vacuum-cleaning robot works in a rectangular room divided into cells. Some cells are obstacles,
+some are dirty, and one is the charging station. The robot must (1) choose a time slot for every
+cleaning task so that all scheduling constraints hold, then (2) navigate from the charger to each
+dirty cell in slot order and back to the charger, using graph search.
+
+\textbf{Environment grid.} \code{Grid} is an immutable record with \code{rows}, \code{cols}, the set
+of \code{obstacles}, the dirty cells \code{dirty} (label $\to$ cell, in file order, labels
+D1\dots Dn) and the \code{charger} cell (\dec{06}). Coordinates are zero-based \code{(row, col)}
+with \code{(0, 0)} at the top left. Dirty cells and the charger are passable; only obstacles and
+out-of-bounds cells are blocked.
+
+\textbf{Search problem (one navigation leg).}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Element & Representation \\
+\midrule
+State & the robot's cell \code{(row, col)} \\
+Initial state & the leg's start cell (charger or previous dirty cell) \\
+Actions & UP $(-1,0)$, DOWN $(+1,0)$, LEFT $(0,-1)$, RIGHT $(0,+1)$, tried in that order (\dec{06}) \\
+Transition model & \code{get\_successors(state, grid)}: apply the action; keep the result if it is inside the grid and not an obstacle \\
+Goal test & \code{goal\_test(state, goal\_state)}: the robot is on the leg's target cell \\
+Step cost & 1 per move; \code{path\_cost(path)} $=$ \code{len(path)} $-1$, and 0 for an empty path (\dec{04}) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\textbf{CSP (scheduling).} Variables are the task labels D1\dots Dn (all dirty cells, including
+tasks with no constraint). The domain of each variable is the slots $\{1,\dots,T\}$, where $T$ comes
+from line 1 of \code{Schedule.txt}; slots are integers and are shown as T1\dots T$T$ (\dec{06}).
+There are three constraint types:
+\begin{itemize}
+  \item \emph{Precedence} $(D_i, D_j)$: $\mathrm{slot}(D_i) < \mathrm{slot}(D_j)$.
+  \item \emph{Latest slot} $(D_i, T_k)$: $\mathrm{slot}(D_i) \le k$.
+  \item \emph{Slot exclusivity} (implicit): no two tasks share a slot.
+\end{itemize}
+
+\textbf{Input formats.} \code{Environment.txt} has six lines: \code{rows,cols}; number of obstacles;
+obstacle tuples; number of dirty cells; dirty-cell tuples; charger tuple. \code{Schedule.txt} has:
+number of slots; number of precedence pairs; one \code{(Di,Dj)} per line; number of latest-slot
+constraints; one \code{(Di,Tk)} per line. Both files are read at run time; nothing is hard-coded.
+The parsers raise a single \code{InputError} naming the file, line and problem (\dec{07}). The rules
+for whitespace, empty lists and value checks (duplicates, overlaps, out-of-bounds cells, unknown
+labels) are \dec{08}--\dec{13}.
+
+Our own environment (\code{Environment.txt}) is a $10\times10$ room with 27 obstacles forming two
+walls and a pocket, 5 dirty cells, and the charger at $(0,0)$. \code{Schedule.txt} has 6 slots, the
+precedence chain D1$\to$D2$\to$D3$\to$D4, and the limits D4 $\le$ T4 and D2 $\le$ T3. D5 is
+unconstrained, so it tests the ``every task gets a slot'' rule.

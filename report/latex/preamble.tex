@@ -1,0 +1,55 @@
+% !TEX root = main.tex
+% Format rules (spec §8.2, REQ-RPT-11): Times New Roman, 11 pt body, 12 or 14 pt headings.
+
+\usepackage{iftex}
+\ifXeTeX
+  % Tectonic / XeLaTeX: the real Times New Roman if installed (ttf-ms-fonts on Arch);
+  % otherwise TeX Gyre Termes, a Times clone shipped with every TeX bundle.
+  \usepackage{fontspec}
+  \IfFontExistsTF{Times New Roman}
+    {\setmainfont{Times New Roman}}
+    {\setmainfont{TeX Gyre Termes}%
+     \typeout{WARNING: Times New Roman not found, using TeX Gyre Termes}}
+\else
+  % Overleaf with pdfLaTeX: Times clone.
+  \usepackage[T1]{fontenc}
+  \usepackage{newtxtext}
+\fi
+\usepackage{amsmath,amssymb}
+
+\usepackage[a4paper,margin=2.2cm]{geometry}
+\usepackage{graphicx}
+\graphicspath{{figures/}{../figures/}{../screenshots/}}
+\usepackage{pdfpages}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
+\usepackage{enumitem}
+\setlist{itemsep=1pt,topsep=3pt}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+% Headings: 14 pt sections, 12 pt subsections (REQ-RPT-11).
+\usepackage{titlesec}
+\titleformat{\section}{\fontsize{14}{17}\selectfont\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\fontsize{12}{14}\selectfont\bfseries}{\thesubsection}{0.5em}{}
+\titlespacing*{\section}{0pt}{10pt}{4pt}
+\titlespacing*{\subsection}{0pt}{8pt}{3pt}
+
+% Page numbers in the footer; the rubric page (page 1) has none.
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+
+\newcommand{\astar}{A\textsuperscript{*}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\dec}[1]{DEC-#1}

@@ -1,0 +1,53 @@
+% !TEX root = ../main.tex
+\section{Testing and Validation}
+
+We ran the notebook end to end on three file pairs (spec §8.2). Each figure shows the input files
+(configuration), the parsed grid with the CSP schedule and its constraint check, and the integration
+output for UCS (left) and \astar{} (right). The same images are embedded in the notebook.
+
+\textbf{Test run 1: our files (\code{Environment.txt}, \code{Schedule.txt}).} The schedule is
+D1\dots D5 in T1\dots T5, with T6 empty, and all constraints are satisfied. Both algorithms clean
+all five cells and return to the charger: 64 moves, cost 64, status SUCCESS.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{run1_own.png}
+\caption{Test run 1: own environment and schedule.}
+\label{fig:run1}
+\end{figure}
+
+\textbf{Test run 2: provided sample (\code{Environment\_Sample.txt}, \code{Schedule\_Sample.txt}).}
+The schedule is T1:D2, T2:D1, T3:D3, T4:D4, and all constraints are satisfied. Both algorithms
+finish with 34 moves, cost 34, status SUCCESS.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{run2_sample.png}
+\caption{Test run 2: provided sample files.}
+\label{fig:run2}
+\end{figure}
+
+\textbf{Test run 3: failure case (\code{Environment\_Error.txt}, \code{Schedule\_Error.txt}).} This is
+our environment with two extra obstacles at (8,0) and (9,1), which wall in D5 at (9,0). The schedule
+is unchanged and still feasible, so the CSP succeeds. The leg D4$\to$D5 then returns no path (69
+nodes expanded). The system stops there and prints
+\code{FAILURE: no path from D4 (9, 5) to D5 (9, 0)}, lists D1--D4 as cleaned and D5 as not cleaned,
+and states that the robot did not return to the charger. The final grid shows D5 still dirty.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{run3_error.png}
+\caption{Test run 3: unreachable dirty cell detected and reported.}
+\label{fig:run3}
+\end{figure}
+
+\textbf{Automated tests.} In addition to the three runs, \code{pytest} runs 94 tests (all passing).
+They cover the parsers (valid files, the sample files, and each invalid-input rule), successors,
+path cost, the heuristic and both search algorithms (including start $=$ goal and no path; costs on
+many start/goal pairs of our grid are checked against a breadth-first-search distance), the CSP
+functions (checked against a brute-force solver that tries every assignment), integration (success,
+an unreachable leg, an infeasible schedule) and the display. A seeded generator
+(\code{tools/gen\_env.py}) produces random reachable/unreachable environments and
+feasible/infeasible schedules; property-based tests (Hypothesis) check that the generated files
+parse and have the requested properties. Continuous integration runs lint, tests, robustness,
+interface checks, and a full execution of the notebook on every pull request.
