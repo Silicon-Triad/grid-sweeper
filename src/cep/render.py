@@ -10,5 +10,129 @@ Spec: "The integrated program must display:
 - The final status indicating whether all dirty locations were cleaned and
   the robot returned to the charging station."
 
-No frozen signatures; functions are added under issue #24.
+Spec §6.4: "Display the generated schedule and show that each constraint is
+satisfied" (REQ-CSP-19).
+
+All functions return strings; the caller prints them, so tests can compare
+text and the notebook output is plain and screenshot-friendly.
 """
+
+from collections.abc import Mapping
+from dataclasses import dataclass
+
+from cep.env import Constraints, Label, Slot
+
+PASS, FAIL = "✓", "✗"
+
+
+@dataclass(frozen=True)
+class Check:
+    """One constraint checked against a complete assignment (REQ-CSP-19).
+
+    Attributes:
+        kind: ``"precedence"``, ``"latest"``, ``"exclusivity"`` or
+            ``"assigned"``.
+        text: Human-readable evidence, e.g. ``"D1 (T1) before D3 (T3)"``.
+        ok: Whether the constraint holds.
+    """
+
+    kind: str
+    text: str
+    ok: bool
+
+
+def check_schedule(
+    assignment: Mapping[Label, Slot], constraints: Constraints
+) -> list[Check]:
+    """Check every constraint of the problem against an assignment.
+
+    Independent of the solver's own checks, so it is an actual proof that
+    the schedule it returned is valid, not a repeat of the same code.
+
+    Args:
+        assignment: Label -> slot (complete or not).
+        constraints: Scheduling problem.
+
+    Returns:
+        One ``Check`` per task-assigned test, per precedence pair, per
+        latest-slot limit, plus one for slot exclusivity.
+    """
+    checks = []
+    for v in constraints.variables:
+        slot = assignment.get(v)
+        ok = slot is not None and 1 <= slot <= constraints.num_slots
+        shown = "unassigned" if slot is None else f"T{slot}"
+        checks.append(Check("assigned", f"{v} assigned a slot: {shown}", ok))
+
+    for before, after in constraints.precedence:
+        b, a = assignment.get(before), assignment.get(after)
+        ok = b is not None and a is not None and b < a
+        checks.append(
+            Check(
+                "precedence",
+                f"{before} ({_slot(b)}) before {after} ({_slot(a)})",
+                ok,
+            )
+        )
+
+    for task, limit in constraints.latest.items():
+        s = assignment.get(task)
+        ok = s is not None and s <= limit
+        checks.append(Check("latest", f"{task} ≤ T{limit}: {_slot(s)}", ok))
+
+    # Exclusivity: no slot used by two tasks (REQ-CSP-07).
+    by_slot: dict[Slot, list[Label]] = {}
+    for v, s in assignment.items():
+        by_slot.setdefault(s, []).append(v)
+    clashes = [
+        f"T{s}: {', '.join(vs)}" for s, vs in sorted(by_slot.items()) if len(vs) > 1
+    ]
+    text = "slot exclusivity: " + (
+        "; ".join(clashes) if clashes else "every slot ≤ 1 task"
+    )
+    checks.append(Check("exclusivity", text, not clashes))
+    return checks
+
+
+def _slot(slot: Slot | None) -> str:
+    """Format a slot as ``T<n>``, or ``"-"`` when missing."""
+    return "-" if slot is None else f"T{slot}"
+
+
+def format_schedule(assignment: Mapping[Label, Slot], num_slots: int) -> str:
+    """Slot table T1…Tn -> task; empty slots shown as ``-`` (REQ-CSP-19).
+
+    Args:
+        assignment: Label -> slot.
+        num_slots: Number of available slots.
+
+    Returns:
+        Multi-line table text.
+    """
+    task_in = {s: v for v, s in assignment.items()}
+    lines = ["Slot | Task", "-----+-----"]
+    for s in range(1, num_slots + 1):
+        lines.append(f"{'T' + str(s):<4} | {task_in.get(s, '-')}")
+    return "\n".join(lines)
+
+
+def format_schedule_proof(
+    assignment: Mapping[Label, Slot] | None, constraints: Constraints
+) -> str:
+    """Schedule table plus each constraint with ✓/✗ (spec §6.4, REQ-CSP-19).
+
+    Args:
+        assignment: Solver result, or None if no feasible schedule exists.
+        constraints: Scheduling problem.
+
+    Returns:
+        Text to print.
+    """
+    if assignment is None:
+        return "No feasible schedule: the CSP solver reports failure."
+    checks = check_schedule(assignment, constraints)
+    lines = [format_schedule(assignment, constraints.num_slots), "", "Constraints:"]
+    lines += [f"  {c.text} {PASS if c.ok else FAIL}" for c in checks]
+    verdict = "all constraints satisfied" if all(c.ok for c in checks) else "VIOLATED"
+    lines.append(f"Result: {verdict}")
+    return "\n".join(lines)
