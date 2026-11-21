@@ -13,9 +13,32 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from cep.env import parse_environment, parse_schedule  # noqa: E402
 
+Cell = tuple[int, int]
 
-def neighbours(cell, rows, cols):
-    """Return valid four-direction neighbouring cells."""
+
+def format_cell(cell: Cell) -> str:
+    """Format a cell using the coordinate format required by the specification.
+
+    Args:
+        cell: A row and column pair.
+
+    Returns:
+        The coordinate formatted without spaces, such as ``(1,3)``.
+    """
+    return f"({cell[0]},{cell[1]})"
+
+
+def neighbours(cell: Cell, rows: int, cols: int) -> list[Cell]:
+    """Return valid four-direction neighbouring cells.
+
+    Args:
+        cell: The cell whose neighbours are required.
+        rows: Number of grid rows.
+        cols: Number of grid columns.
+
+    Returns:
+        A list of in-bounds neighbouring cells.
+    """
     r, c = cell
     return [
         (nr, nc)
@@ -24,8 +47,25 @@ def neighbours(cell, rows, cols):
     ]
 
 
-def all_reachable(rows, cols, obstacles, charger, dirty):
-    """Check whether all dirty cells are reachable from the charger."""
+def all_reachable(
+    rows: int,
+    cols: int,
+    obstacles: set[Cell],
+    charger: Cell,
+    dirty: list[Cell],
+) -> bool:
+    """Check whether all dirty cells are reachable from the charger.
+
+    Args:
+        rows: Number of grid rows.
+        cols: Number of grid columns.
+        obstacles: Cells that cannot be entered.
+        charger: Starting cell.
+        dirty: Cells that must be reachable.
+
+    Returns:
+        True if every dirty cell is reachable, otherwise False.
+    """
     visited = {charger}
     queue = deque([charger])
 
@@ -39,8 +79,31 @@ def all_reachable(rows, cols, obstacles, charger, dirty):
     return all(cell in visited for cell in dirty)
 
 
-def make_environment(rng, rows, cols, obstacle_count, dirt_count, unreachable):
-    """Generate a valid environment file."""
+def make_environment(
+    rng: random.Random,
+    rows: int,
+    cols: int,
+    obstacle_count: int,
+    dirt_count: int,
+    unreachable: bool,
+) -> str:
+    """Generate a reachable or deliberately unreachable environment.
+
+    Args:
+        rng: Random number generator used for reproducibility.
+        rows: Number of grid rows.
+        cols: Number of grid columns.
+        obstacle_count: Number of obstacle cells.
+        dirt_count: Number of dirty cells.
+        unreachable: Whether to create an unreachable dirty cell.
+
+    Returns:
+        The generated Environment.txt contents.
+
+    Raises:
+        ValueError: If the requested dimensions or cell counts are invalid,
+            or if a suitable environment cannot be generated.
+    """
     if rows <= 0 or cols <= 0:
         raise ValueError("Grid dimensions must be positive.")
     if dirt_count < 1:
@@ -53,28 +116,48 @@ def make_environment(rng, rows, cols, obstacle_count, dirt_count, unreachable):
     cells = [(r, c) for r in range(rows) for c in range(cols)]
 
     if unreachable:
-        if rows < 2 or cols < 2:
-            raise ValueError("Unreachable mode requires at least a 2x2 grid.")
+        targets = [
+            cell
+            for cell in cells
+            if len(neighbours(cell, rows, cols)) <= obstacle_count
+        ]
 
-        charger = (0, 0)
-        target = (rows - 1, cols - 1)
+        if not targets:
+            raise ValueError(
+                "Unreachable mode requires enough obstacles to isolate a dirty cell."
+            )
+
+        target = rng.choice(targets)
         blocked = set(neighbours(target, rows, cols))
 
-        if obstacle_count < len(blocked):
-            raise ValueError(
-                f"Unreachable mode requires at least {len(blocked)} obstacles."
-            )
+        charger_candidates = [
+            cell for cell in cells if cell != target and cell not in blocked
+        ]
+
+        if not charger_candidates:
+            raise ValueError("Unreachable mode requires a separate charger cell.")
+
+        charger = rng.choice(charger_candidates)
 
         available = [
             cell
             for cell in cells
             if cell not in blocked and cell not in {charger, target}
         ]
+
+        required_extra = obstacle_count - len(blocked)
+        if len(available) < dirt_count - 1 + required_extra:
+            raise ValueError(
+                "Not enough available cells for the requested dirt "
+                "and obstacles in unreachable mode."
+            )
+
         other_dirt = rng.sample(available, dirt_count - 1)
         dirty = [target, *other_dirt]
+        rng.shuffle(dirty)
 
         remaining = [cell for cell in available if cell not in other_dirt]
-        extra = rng.sample(remaining, obstacle_count - len(blocked))
+        extra = rng.sample(remaining, required_extra)
         obstacles = blocked | set(extra)
 
     else:
@@ -98,18 +181,30 @@ def make_environment(rng, rows, cols, obstacle_count, dirt_count, unreachable):
             [
                 f"{rows},{cols}",
                 str(len(obstacles)),
-                ", ".join(map(str, sorted(obstacles))),
+                ", ".join(format_cell(cell) for cell in sorted(obstacles)),
                 str(len(dirty)),
-                ", ".join(map(str, dirty)),
-                str(charger),
+                ", ".join(format_cell(cell) for cell in dirty),
+                format_cell(charger),
             ]
         )
         + "\n"
     )
 
 
-def make_schedule(rng, dirt_count, infeasible):
-    """Generate a feasible or deliberately infeasible schedule."""
+def make_schedule(rng: random.Random, dirt_count: int, infeasible: bool) -> str:
+    """Generate a feasible or deliberately infeasible schedule.
+
+    Args:
+        rng: Random number generator used for reproducibility.
+        dirt_count: Number of dirty-cell tasks.
+        infeasible: Whether to create contradictory constraints.
+
+    Returns:
+        The generated Schedule.txt contents.
+
+    Raises:
+        ValueError: If fewer than one dirty-cell task is requested.
+    """
     if dirt_count < 1:
         raise ValueError("At least one dirty cell is required.")
 
@@ -146,16 +241,13 @@ def make_schedule(rng, dirt_count, infeasible):
     return "\n".join(lines) + "\n"
 
 
-def main():
-    """Read options, generate files, and validate their formats."""
+def main() -> None:
+    """Read command-line options, generate files, and validate their formats."""
     parser = argparse.ArgumentParser(
         description="Generate Grid Sweeper environment and schedule files."
     )
-    parser.add_argument(
-        "--size", nargs=2, type=int, metavar=("ROWS", "COLS"), default=(8, 8)
-    )
-    parser.add_argument("--rows", type=int)
-    parser.add_argument("--cols", type=int)
+    parser.add_argument("--rows", type=int, default=8)
+    parser.add_argument("--cols", type=int, default=8)
     parser.add_argument("--obstacles", type=int, default=6)
     parser.add_argument("--dirt", type=int, default=4)
     parser.add_argument(
@@ -167,14 +259,12 @@ def main():
     parser.add_argument("--output-dir", type=Path, default=Path("generated"))
     args = parser.parse_args()
 
-    rows = args.rows if args.rows is not None else args.size[0]
-    cols = args.cols if args.cols is not None else args.size[1]
     rng = random.Random(args.seed)
 
     environment = make_environment(
         rng,
-        rows,
-        cols,
+        args.rows,
+        args.cols,
         args.obstacles,
         args.dirt,
         args.mode == "unreachable",
