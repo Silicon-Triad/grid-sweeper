@@ -181,7 +181,9 @@ def _stop(label: str) -> str:
     return "C" if label == CHARGER else label
 
 
-def format_legs(result: IntegrationResult) -> str:
+# "IntegrationResult" is quoted so that this module's code can be placed before
+# integrate.py's in the notebook (#27); it is only needed when called.
+def format_legs(result: "IntegrationResult") -> str:
     """One block per search call: path, cost, nodes expanded (REQ-INT-08).
 
     Args:
@@ -207,7 +209,7 @@ def format_legs(result: IntegrationResult) -> str:
     return "\n".join(lines)
 
 
-def format_result(result: IntegrationResult, grid: Grid) -> str:
+def format_result(result: "IntegrationResult", grid: Grid) -> str:
     """Full integration report, in spec §7.2 Output Requirements order.
 
     Args:
