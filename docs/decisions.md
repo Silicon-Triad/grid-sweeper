@@ -147,3 +147,23 @@ comes from a `spec-question` issue, is labelled `design-decision`, and is
 - **Rationale:** Tests can use inline strings; file reading stays one line.
 - **Affects REQ-IDs:** REQ-ENV-01, REQ-CSP-01
 - **Decided by / date:** Qazi, 2026-11-18
+
+### DEC-14 — What counts as a node expanded in `search` — **DECIDED**
+- **Issue:** #51
+- **Spec reference:** §5.5 "nodes_expanded: Number of nodes expanded during the search" — when a node counts is not stated.
+- **Question:** Does the goal count? What does start == goal report?
+- **Options considered:** (A) count a node when its successors are generated; goal tested on pop and not counted; (B) count every node popped, including the goal; (C) count nodes generated
+- **Decision:** (A), as implemented in PR #50: start == goal → `([start], 0, 0)`; no path → number of reachable cells expanded (team choice, not a spec value).
+- **Rationale:** Matches the textbook meaning of "expand" (generate successors); the goal's successors are never generated. A and B rank UCS vs A* identically (B adds +1 to every successful search). C measures something else.
+- **Affects REQ-IDs:** REQ-SRCH-09, REQ-SRCH-13, REQ-CMP-01, REQ-CMP-02
+- **Decided by / date:** Qazi, 2026-11-21
+
+### DEC-15 — `execute_schedule` return values on failure — **DECIDED**
+- **Issue:** #23
+- **Spec reference:** §7.2 step 9 "report failure rather than claim that the cleaning task was completed successfully" — the content of `complete_path`/`total_cost` on failure is not stated.
+- **Question:** On a leg with no path, what are `complete_path` and `total_cost`?
+- **Options considered:** partial path walked so far + its cost; `(None, None, False)`
+- **Decision:** Stop at the first leg with no path and return the path walked so far (from the charger to the last cell reached), its cost, and `success=False`. If the CSP finds no schedule, no search is run: path `[charger]`, cost 0, failure (team choice, not a spec value).
+- **Rationale:** Shows where the robot got stuck; the display (#24) prints the failure reason. `success` alone decides success (DEC-04).
+- **Affects REQ-IDs:** REQ-INT-05, REQ-INT-07
+- **Decided by / date:** Qazi, 2026-11-21
