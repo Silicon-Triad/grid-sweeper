@@ -54,3 +54,47 @@ def test_schedule_proof_data_files():
         c = load_schedule(DATA / sched, g)
         a = backtracking_search(list(c.variables), initial_domains(c), c)
         assert all(ch.ok for ch in check_schedule(a, c))
+
+
+# --- #24 integration display (REQ-INT-08) ---
+from cep.env import Grid  # noqa: E402
+from cep.integrate import plan_and_execute, run_integration  # noqa: E402
+from cep.render import format_grid, format_result  # noqa: E402
+
+
+def tiny(obstacles=()):
+    return Grid(2, 3, frozenset(obstacles), MappingProxyType({"D1": (0, 2)}), (0, 0))
+
+
+def test_format_grid_symbols():
+    g = tiny(obstacles=[(1, 1)])
+    assert format_grid(g).splitlines() == [
+        "     0  1  2",
+        "  0  C  . D1",
+        "  1  . ##  .",
+    ]
+    text = format_grid(g, [(0, 0), (0, 1), (0, 2)], ["D1"])
+    assert text.splitlines()[1] == "  0  C  * d1"
+
+
+def test_format_result_success():
+    g = tiny()
+    text = format_result(run_integration(g, g.charger, ["D1"], "ucs"), g)
+    assert "Visit sequence: C -> D1 -> C" in text
+    assert "Leg 1: C (0, 0) -> D1 (0, 2): cost 2, nodes expanded" in text
+    assert "Total moves: 4, total cost: 4" in text
+    assert "Status: SUCCESS" in text
+
+
+def test_format_result_failure():
+    g = tiny(obstacles=[(0, 1), (1, 1)])
+    text = format_result(run_integration(g, g.charger, ["D1"], "astar"), g)
+    assert "NO PATH" in text and "Status: FAILURE: no path from C" in text
+    assert "SUCCESS" not in text
+
+
+def test_format_result_data_files():
+    g = load_environment(DATA / "Environment.txt")
+    c = load_schedule(DATA / "Schedule.txt", g)
+    text = format_result(plan_and_execute(g, c, "astar"), g)
+    assert "Schedule: T1:D1, T2:D2" in text and "Status: SUCCESS" in text

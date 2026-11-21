@@ -20,9 +20,14 @@ text and the notebook output is plain and screenshot-friendly.
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from cep.env import Constraints, Label, Slot
+from cep.env import Constraints, Grid, Label, Slot, State
+from cep.integrate import CHARGER, IntegrationResult
 
 PASS, FAIL = "✓", "✗"
+
+# Grid symbols (display choice). Cleaned cells use lower case "d" so the task
+# number stays visible after cleaning.
+LEGEND = "Legend: C charger, ## obstacle, Dk dirty, dk cleaned, * path, . free"
 
 
 @dataclass(frozen=True)
@@ -135,4 +140,103 @@ def format_schedule_proof(
     lines += [f"  {c.text} {PASS if c.ok else FAIL}" for c in checks]
     verdict = "all constraints satisfied" if all(c.ok for c in checks) else "VIOLATED"
     lines.append(f"Result: {verdict}")
+    return "\n".join(lines)
+
+
+def format_grid(
+    grid: Grid,
+    path: list[State] | None = None,
+    cleaned: list[Label] | tuple[Label, ...] = (),
+) -> str:
+    """Draw the grid as text with row/column numbers (REQ-INT-08).
+
+    Args:
+        grid: Environment.
+        path: States to mark with ``*`` (stops keep their own symbol).
+        cleaned: Labels already cleaned, drawn as ``dk``.
+
+    Returns:
+        Multi-line grid text, row 0 at the top.
+    """
+    cells: dict[State, str] = {}
+    for state in path or []:
+        cells[state] = "*"
+    for cell in grid.obstacles:
+        cells[cell] = "##"
+    for label, cell in grid.dirty.items():
+        cells[cell] = label.lower() if label in cleaned else label
+    cells[grid.charger] = "C"
+
+    width = 3
+    header = " " * width + "".join(f"{c:>{width}}" for c in range(grid.cols))
+    lines = [header]
+    for r in range(grid.rows):
+        row = "".join(f"{cells.get((r, c), '.'):>{width}}" for c in range(grid.cols))
+        lines.append(f"{r:>{width}}{row}")
+    return "\n".join(lines)
+
+
+def _stop(label: str) -> str:
+    """Name a stop for display: the charger is shown as ``C``."""
+    return "C" if label == CHARGER else label
+
+
+def format_legs(result: IntegrationResult) -> str:
+    """One block per search call: path, cost, nodes expanded (REQ-INT-08).
+
+    Args:
+        result: Integration result.
+
+    Returns:
+        Text to print.
+    """
+    lines = []
+    for i, leg in enumerate(result.legs, start=1):
+        head = (
+            f"Leg {i}: {_stop(leg.source)} {leg.start} -> "
+            f"{_stop(leg.target)} {leg.goal}"
+        )
+        if leg.path is None:
+            lines.append(f"{head}: NO PATH (nodes expanded {leg.nodes_expanded})")
+        else:
+            steps = " -> ".join(str(s) for s in leg.path)
+            lines.append(
+                f"{head}: cost {leg.cost}, nodes expanded {leg.nodes_expanded}"
+            )
+            lines.append(f"  {steps}")
+    return "\n".join(lines)
+
+
+def format_result(result: IntegrationResult, grid: Grid) -> str:
+    """Full integration report, in spec §7.2 Output Requirements order.
+
+    Args:
+        result: Integration result from ``plan_and_execute``/``run_integration``.
+        grid: Environment it ran on.
+
+    Returns:
+        Text to print.
+    """
+    lines = [f"=== Integration ({result.algorithm}) ==="]
+    if result.assignment is not None:
+        order = [f"T{result.assignment[x]}:{x}" for x in result.schedule]
+    else:
+        order = list(result.schedule)
+    lines.append("Schedule: " + (", ".join(order) if order else "none"))
+    visited = ["C"] + result.cleaned + (["C"] if result.success else [])
+    lines.append("Visit sequence: " + " -> ".join(visited))
+    lines += ["", "Paths:", format_legs(result) or "  (no search run)", ""]
+    lines += ["Final grid:", format_grid(grid, result.complete_path, result.cleaned)]
+    lines.append(LEGEND)
+    moves = len(result.complete_path) - 1
+    lines.append(f"Total moves: {moves}, total cost: {result.total_cost}")
+    if result.success:
+        status = "SUCCESS: all dirty locations cleaned, robot back at charger"
+    else:
+        left = [x for x in grid.dirty if x not in result.cleaned]
+        status = (
+            f"FAILURE: {result.reason}; cleaned {result.cleaned or 'none'}, "
+            f"not cleaned {left}, robot did not return to charger"
+        )
+    lines.append("Status: " + status)
     return "\n".join(lines)
