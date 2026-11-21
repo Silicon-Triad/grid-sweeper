@@ -24,5 +24,6 @@ report's "Generative AI Use Declaration" (spec §8.2).
 | 2026-11-19 | Mujtaba | Claude Code (Claude Opus 5.5) | Drafted heuristic justification (admissible + consistent) notebook markdown + report paragraph — AI-written prose, declare in report | #15 |
 | 2026-11-19 | Mujtaba | Claude Code (Claude Opus 5.5) | Authored src/cep/compare.py, tools/compare_search.py, tests/test_compare.py, comparison tables/plot and analysis draft | #16 |
 | 2026-11-21 | Ashar | ChatGPT (GPT-6) | Reviewed and updated environment parser tests; added grid-cell, reachability, overlap, sample-file and invalid-input checks; removed duplicate root Environment.txt | #7 / #55 |
+| 2026-11-20 | Ashar | ChatGPT (GPT-6) | AI-assisted implementation and validation of random environment and schedule generator; tested four modes, seeded reproducibility, custom dimensions, and code quality | #6 |
 | 2026-11-19 | Huzaifa | Claude Code (Claude Opus 5.5) | Authored CSP solver in src/cep/csp.py (is_consistent, MRV+degree per DEC-05, forward checking with copy-based restoration, LCV, backtracking) and tests/test_csp.py (incl. brute-force oracle) | #17 #18 #19 #20 #21 |
 | 2026-11-20 | Huzaifa | Claude Code (Claude Opus 5.5) | Resolved merge conflict in report/genai_log.md on PR #52 (kept all rows) | #52 |
