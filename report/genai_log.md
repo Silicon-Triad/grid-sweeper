@@ -22,3 +22,4 @@ report's "Generative AI Use Declaration" (spec §8.2).
 | 2026-11-19 | Mujtaba | Claude Code (Claude Opus 5.5) | Authored get_successors/goal_test/path_cost/heuristic and UCS/A* search (shared priority queue, start==goal, no path) in src/cep/search.py + tests/test_search.py | #11 #12 #13 #14 |
 | 2026-11-19 | Mujtaba | Claude Code (Claude Opus 5.5) | Drafted heuristic justification (admissible + consistent) notebook markdown + report paragraph — AI-written prose, declare in report | #15 |
 | 2026-11-19 | Mujtaba | Claude Code (Claude Opus 5.5) | Authored src/cep/compare.py, tools/compare_search.py, tests/test_compare.py, comparison tables/plot and analysis draft | #16 |
+| 2026-11-21 | Ashar | ChatGPT (GPT-6) | Reviewed and updated environment parser tests; added grid-cell, reachability, overlap, sample-file and invalid-input checks; removed duplicate root Environment.txt | #7 / #55 |
