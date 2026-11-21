@@ -29,3 +29,4 @@ report's "Generative AI Use Declaration" (spec §8.2).
 | 2026-11-20 | Huzaifa | Claude Code (Claude Opus 5.5) | Resolved merge conflict in report/genai_log.md on PR #52 (kept all rows) | #52 |
 | 2026-11-21 | Qazi | Claude Code (Claude Opus 5.5) | Authored execute_schedule, run_integration, plan_and_execute, schedule_from_assignment in src/cep/integrate.py + tests/test_integrate.py; recorded DEC-14 (#51) and DEC-15 | #23 #51 |
 | 2026-11-20 | Huzaifa | Claude Code (Claude Opus 5.5) | Resolved merge conflict in report/genai_log.md on PR #52 (kept all rows) | #52 |
+| 2026-11-21 | Qazi | Claude Code (Claude Opus 5.5) | Authored check_schedule / format_schedule / format_schedule_proof in src/cep/render.py + tests/test_render.py | #22 |
