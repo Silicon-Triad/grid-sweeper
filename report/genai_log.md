@@ -32,3 +32,4 @@ report's "Generative AI Use Declaration" (spec §8.2).
 | 2026-11-21 | Qazi | Claude Code (Claude Opus 5.5) | Authored check_schedule / format_schedule / format_schedule_proof in src/cep/render.py + tests/test_render.py | #22 |
 | 2026-11-21 | Qazi | Claude Code (Claude Opus 5.5) | Authored format_grid / format_legs / format_result in src/cep/render.py + tests | #24 |
 | 2026-11-21 | Qazi | Claude Code (Claude Opus 5.5) | Authored tools/build_notebook.py, notebook/markdown/* cells (AI-written prose — declare in report), generated notebook/CS24045.ipynb; quoted IntegrationResult annotation in render.py so code cells can be ordered by section | #27 |
+| 2026-11-21 | Qazi | Claude Code (Claude Opus 5.5) | Executed notebook test runs 1–3, rendered report/screenshots/run*.png from the real outputs (throwaway Playwright script, not committed), embedded them as notebook cell attachments via tools/build_notebook.py | #26 |

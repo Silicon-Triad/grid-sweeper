@@ -12,6 +12,7 @@ byte-identical. Usage:
 """
 
 import argparse
+import base64
 import re
 import subprocess
 import sys
@@ -23,6 +24,12 @@ ROOT = Path(__file__).resolve().parent.parent
 NOTEBOOK = ROOT / "notebook" / "CS24045.ipynb"
 MARKDOWN = ROOT / "notebook" / "markdown"
 SRC = ROOT / "src" / "cep"
+SCREENSHOTS = ROOT / "report" / "screenshots"
+
+# ``![alt](attachment:name.png)`` in a markdown cell embeds report/screenshots/name.png.
+# Attachments live inside the .ipynb, so the images survive uploading the
+# notebook alone to Classroom (spec §10.1), unlike links to files beside it.
+_ATTACHMENT = re.compile(r"\(attachment:([\w.-]+\.png)\)")
 
 # Imports between our own modules; dropped because the cells share a namespace.
 _CEP_IMPORT = re.compile(r"^(from cep(\.\w+)? import .*|import cep.*)\n", re.MULTILINE)
@@ -231,6 +238,18 @@ def cells() -> list[tuple[str, str]]:
     ]
 
 
+def _png(name: str) -> str:
+    """Base64 text of a screenshot, for a markdown cell attachment.
+
+    Args:
+        name: File name in ``report/screenshots``.
+
+    Returns:
+        Base64-encoded PNG.
+    """
+    return base64.b64encode((SCREENSHOTS / name).read_bytes()).decode("ascii")
+
+
 def build() -> str:
     """Build the notebook JSON text.
 
@@ -250,6 +269,9 @@ def build() -> str:
         text = text.strip()
         if kind == "md":
             cell = nbformat.v4.new_markdown_cell(text)
+            names = _ATTACHMENT.findall(text)
+            if names:
+                cell.attachments = {n: {"image/png": _png(n)} for n in names}
         else:
             cell = nbformat.v4.new_code_cell(text)
         cell.id = str(i)  # fixed ids, numbered as nbstripout does
