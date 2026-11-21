@@ -1,3 +1,3 @@
 *Screenshot of test run 3 (failure detected and reported):*
 
-<!-- SCREENSHOT: test run 3 — paste image here -->
+![Test run 3: configuration and output](attachment:run3_error.png)
