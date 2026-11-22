@@ -1,47 +1,110 @@
 % !TEX root = ../main.tex
 \section{Testing and Validation}
 
-We ran the notebook end to end on three file pairs (spec §8.2). Each figure shows the input files
-(configuration), the parsed grid with the CSP schedule and its constraint check, and the integration
-output for UCS (left) and \astar{} (right). The same images are embedded in the notebook.
+We ran the notebook end to end on three file pairs (spec §8.2). For each run, the configuration is
+the content of the two input files, shown below as text exactly as read from disk. The output
+is shown in three screenshots of the notebook cell: the parsed grid with the CSP schedule and its
+constraint check, then the integration output for UCS, then for \astar.
 
-\textbf{Test run 1: our files (\code{Environment.txt}, \code{Schedule.txt}).} The schedule is
-D1\dots D5 in T1\dots T5, with T6 empty, and all constraints are satisfied. Both algorithms clean
-all five cells and return to the charger: 64 moves, cost 64, status SUCCESS.
+\subsection{Test run 1: our files (\code{Environment.txt}, \code{Schedule.txt})}
+The schedule is D1\dots D5 in T1\dots T5, with T6 empty, and all constraints are satisfied. Both
+algorithms clean all five cells and return to the charger: 64 moves, cost 64, status SUCCESS.
+
+\textbf{Configuration.} \code{Environment.txt}:
+\VerbatimInput{../../data/Environment.txt}
+\code{Schedule.txt}:
+\VerbatimInput{../../data/Schedule.txt}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{run1_own.png}
-\caption{Test run 1: own environment and schedule.}
-\label{fig:run1}
+\includegraphics[width=0.8\linewidth]{run1_schedule.png}
+\caption{Test run 1 (own files): parsed grid, CSP schedule and constraint check.}
+\label{fig:run1-schedule}
 \end{figure}
 
-\textbf{Test run 2: provided sample (\code{Environment\_Sample.txt}, \code{Schedule\_Sample.txt}).}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{run1_ucs.png}
+\caption{Test run 1 (own files): integration output with UCS.}
+\label{fig:run1-ucs}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{run1_astar.png}
+\caption{Test run 1 (own files): integration output with \astar.}
+\label{fig:run1-astar}
+\end{figure}
+
+
+\subsection{Test run 2: provided sample (\code{Environment\_Sample.txt}, \code{Schedule\_Sample.txt})}
 The schedule is T1:D2, T2:D1, T3:D3, T4:D4, and all constraints are satisfied. Both algorithms
 finish with 34 moves, cost 34, status SUCCESS.
 
+\textbf{Configuration.} \code{Environment\_Sample.txt}:
+\VerbatimInput{../../data/Environment_Sample.txt}
+\code{Schedule\_Sample.txt}:
+\VerbatimInput{../../data/Schedule_Sample.txt}
+
 \begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{run2_sample.png}
-\caption{Test run 2: provided sample files.}
-\label{fig:run2}
+\includegraphics[width=0.8\linewidth]{run2_schedule.png}
+\caption{Test run 2 (sample files): parsed grid, CSP schedule and constraint check.}
+\label{fig:run2-schedule}
 \end{figure}
 
-\textbf{Test run 3: failure case (\code{Environment\_Error.txt}, \code{Schedule\_Error.txt}).} This is
-our environment with two extra obstacles at (8,0) and (9,1), which wall in D5 at (9,0). The schedule
-is unchanged and still feasible, so the CSP succeeds. The leg D4$\to$D5 then returns no path (69
-nodes expanded). The system stops there and prints
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{run2_ucs.png}
+\caption{Test run 2 (sample files): integration output with UCS.}
+\label{fig:run2-ucs}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{run2_astar.png}
+\caption{Test run 2 (sample files): integration output with \astar.}
+\label{fig:run2-astar}
+\end{figure}
+
+
+\subsection{Test run 3: failure case (\code{Environment\_Error.txt}, \code{Schedule\_Error.txt})}
+This is our environment with two extra obstacles at (8,0) and (9,1), which wall in D5 at (9,0).
+The schedule is unchanged and still feasible, so the CSP succeeds. The leg D4$\to$D5 then returns no
+path (69 nodes expanded). The system stops there and prints
 \code{FAILURE: no path from D4 (9, 5) to D5 (9, 0)}, lists D1--D4 as cleaned and D5 as not cleaned,
-and states that the robot did not return to the charger. The final grid shows D5 still dirty.
+and states that the robot did not return to the charger. The final grid shows D5 still dirty
+(Figures~\ref{fig:run3-ucs} and~\ref{fig:run3-astar}).
+
+\textbf{Configuration.} \code{Environment\_Error.txt}:
+\VerbatimInput{../../data/Environment_Error.txt}
+\code{Schedule\_Error.txt}:
+\VerbatimInput{../../data/Schedule_Error.txt}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{run3_error.png}
-\caption{Test run 3: unreachable dirty cell detected and reported.}
-\label{fig:run3}
+\includegraphics[width=0.8\linewidth]{run3_schedule.png}
+\caption{Test run 3 (error files): parsed grid, CSP schedule and constraint check.}
+\label{fig:run3-schedule}
 \end{figure}
 
-\textbf{Automated tests.} In addition to the three runs, \code{pytest} runs 94 tests (all passing).
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{run3_ucs.png}
+\caption{Test run 3 (error files): integration output with UCS.}
+\label{fig:run3-ucs}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{run3_astar.png}
+\caption{Test run 3 (error files): integration output with \astar.}
+\label{fig:run3-astar}
+\end{figure}
+
+
+\subsection{Automated tests}
+In addition to the three runs, \code{pytest} runs 94 tests (all passing).
 They cover the parsers (valid files, the sample files, and each invalid-input rule), successors,
 path cost, the heuristic and both search algorithms (including start $=$ goal and no path; costs on
 many start/goal pairs of our grid are checked against a breadth-first-search distance), the CSP

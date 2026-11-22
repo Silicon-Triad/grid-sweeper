@@ -63,7 +63,7 @@ Error & D1, D2, D3, D4, D5 & 46 (stopped) & 259 & 156 & failure: D5 unreachable 
   \item \emph{Path cost.} UCS and \astar{} found paths of equal cost in every run, as expected: both
     are optimal (Manhattan distance is admissible and consistent). The \emph{paths} can still differ
     when several optimal paths exist. On our grid, the leg C$\to$D1 goes via (4,0),(5,0) under UCS
-    and via (3,1),(4,1) under \astar; both have cost 11 (Figure~\ref{fig:run1}).
+    and via (3,1),(4,1) under \astar; both have cost 11 (Figures~\ref{fig:run1-ucs} and~\ref{fig:run1-astar}).
   \item \emph{Nodes expanded.} On our environment, \astar{} expanded 18--65\,\% fewer nodes per pair,
     and 56\,\% fewer over the whole integrated route (112 vs 253). The smallest gain is C$\to$D3: the
     walls force a long detour, so Manhattan distance underestimates more and many cells share the
