@@ -6,19 +6,32 @@
 
 % Page 1: the grading rubric with all four members filled in serves as the title
 % page; no other title page (spec §8.2, REQ-RPT-10). Regenerate: tools/fill_rubric.py
-\includepdf[pages=1,fitpaper]{figures/rubric_filled.pdf}
+% \includepdf[pages=1,fitpaper]{figures/rubric_filled.pdf}
 
-\setcounter{page}{2}
-{\centering
+% Page 1: table of contents (numbering starts here; the rubric is added separately).
+\renewcommand{\contentsname}{Table of Contents}
+\tableofcontents
+\clearpage
+
+% Opening block, on the same page as Section 1 (no title page, spec §8.2).
+{\raggedright
+{\fontsize{11}{13}\selectfont\color{black!45}Complex Engineering Problem\par}
+\vspace{4pt}
 {\fontsize{14}{17}\selectfont\bfseries Intelligent Vacuum-Cleaning Robot: Graph Search and CSP Scheduling\par}
-\vspace{2pt}
-CS-323 Artificial Intelligence, Complex Engineering Problem, TE Batch 2024, Fall 2026\\
-Muhammad Ashar Khan (CS-24035), Huzaifa Hanif (CS-24039), Muhammad Ahmed Qazi (CS-24045),
-Mujtaba Jawaid Rao (CS-24047). Notebook: \code{CS24045.ipynb}\par}
-\vspace{6pt}
-
-Design choices the specification leaves open are team decisions, recorded in our decision log
-as \dec{01}--\dec{15}. They are cited by ID below and are not part of the specification.
+\vspace{10pt}
+{\fontsize{11}{13}\selectfont
+\textbf{Team Members:}\par
+\setlength{\parskip}{0pt}
+Muhammad Ashar Khan (CS-24035)\par
+Huzaifa Hanif (CS-24039)\par
+Muhammad Ahmed Qazi (CS-24045)\par
+Mujtaba Jawaid Rao (CS-24047)\par
+\vspace{10pt}
+\textbf{Notebook:} \code{CS24045.ipynb}\par
+\vspace{10pt}
+\itshape Design choices the specification leaves open are team decisions, recorded in our
+decision log as \dec{01} to \dec{15}. They are cited by ID below and are not part of the
+specification.\par}}
 
 \input{chapters/01_problem}
 \input{chapters/02_search}
