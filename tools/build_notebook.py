@@ -95,13 +95,13 @@ COMPARE = """\
 import matplotlib.pyplot as plt
 
 pair_runs = compare_pairs(grid, charger_pairs(grid), repeats=3)
-print(format_table(pair_runs))
+print(format_table(pair_runs, tablefmt="grid"))
 
 sizes = [5, 10, 20, 40]
 scale = {sc: scaling(sizes, repeats=1, scenario=sc) for sc in SCENARIOS}
 for sc, runs in scale.items():
     print(f"\\nScaling, open grids, {sc}:")
-    print(format_table(runs))
+    print(format_table(runs, tablefmt="grid"))
 
 fig, axes = plt.subplots(1, 2, figsize=(11, 4))
 labels = list(dict.fromkeys(r.label for r in pair_runs))

@@ -12,6 +12,8 @@ import time
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 
+from tabulate import tabulate
+
 from cep.env import ALGORITHMS, Grid, State
 from cep.search import search
 
@@ -139,23 +141,36 @@ def scaling(
     return runs
 
 
-def format_table(runs: Sequence[Run]) -> str:
-    """Render runs as a Markdown table (spec §8.2 tabular comparison).
+def format_table(runs: Sequence[Run], tablefmt: str = "github") -> str:
+    """Render runs as an aligned table (spec §8.2 tabular comparison).
 
     Args:
         runs: Runs to show.
+        tablefmt: ``tabulate`` format: ``"github"`` (Markdown, for the report
+            files) or ``"grid"`` (plain text, for the notebook).
 
     Returns:
-        Markdown table text.
+        Table text.
     """
-    lines = [
-        "| Case | Algorithm | Start | Goal | Path cost | Nodes expanded | Time (ms) |",
-        "|---|---|---|---|---|---|---|",
+    headers = [
+        "Case",
+        "Algorithm",
+        "Start",
+        "Goal",
+        "Path cost",
+        "Nodes expanded",
+        "Time (ms)",
     ]
-    for r in runs:
-        cost = "no path" if r.cost is None else str(r.cost)
-        lines.append(
-            f"| {r.label} | {r.algorithm} | {r.start} | {r.goal} | {cost} "
-            f"| {r.nodes_expanded} | {r.seconds * 1000:.3f} |"
-        )
-    return "\n".join(lines)
+    rows = [
+        [
+            r.label,
+            r.algorithm,
+            str(r.start),
+            str(r.goal),
+            "no path" if r.cost is None else r.cost,
+            r.nodes_expanded,
+            f"{r.seconds * 1000:.3f}",
+        ]
+        for r in runs
+    ]
+    return tabulate(rows, headers=headers, tablefmt=tablefmt)

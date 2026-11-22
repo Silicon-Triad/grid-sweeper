@@ -19,7 +19,7 @@ def test_schedule_proof_satisfied():
     text = format_schedule_proof(a, C)
     assert "D1 (T1) before D3 (T3) ✓" in text
     assert "D2 ≤ T2: T2 ✓" in text
-    assert "T4   | -" in text  # empty slot shown
+    assert "| T4     | -      |" in text  # empty slot shown
     assert "all constraints satisfied" in text
 
 
@@ -69,12 +69,23 @@ def tiny(obstacles=()):
 def test_format_grid_symbols():
     g = tiny(obstacles=[(1, 1)])
     assert format_grid(g).splitlines() == [
-        "     0  1  2",
-        "  0  C  . D1",
-        "  1  . ##  .",
+        "+----+-----+-----+-----+",
+        "|    |  0  |  1  |  2  |",
+        "+====+=====+=====+=====+",
+        "|  0 |  C  |  .  | D1  |",
+        "+----+-----+-----+-----+",
+        "|  1 |  .  | ##  |  .  |",
+        "+----+-----+-----+-----+",
     ]
     text = format_grid(g, [(0, 0), (0, 1), (0, 2)], ["D1"])
-    assert text.splitlines()[1] == "  0  C  * d1"
+    assert text.splitlines()[3] == "|  0 |  C  |  *  | d1  |"
+
+
+def test_format_grid_columns_align_with_two_digit_labels():
+    dirty = {f"D{i}": (0, i - 1) for i in range(1, 12)}
+    g = Grid(1, 11, frozenset(), MappingProxyType(dirty), (0, 0))
+    lines = format_grid(g).splitlines()
+    assert len({len(line) for line in lines}) == 1  # every row equally wide
 
 
 def test_format_result_success():

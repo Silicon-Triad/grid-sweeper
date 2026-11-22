@@ -20,6 +20,8 @@ text and the notebook output is plain and screenshot-friendly.
 from collections.abc import Mapping
 from dataclasses import dataclass
 
+from tabulate import tabulate
+
 from cep.env import Constraints, Grid, Label, Slot, State
 from cep.integrate import CHARGER, IntegrationResult
 
@@ -115,10 +117,8 @@ def format_schedule(assignment: Mapping[Label, Slot], num_slots: int) -> str:
         Multi-line table text.
     """
     task_in = {s: v for v, s in assignment.items()}
-    lines = ["Slot | Task", "-----+-----"]
-    for s in range(1, num_slots + 1):
-        lines.append(f"{'T' + str(s):<4} | {task_in.get(s, '-')}")
-    return "\n".join(lines)
+    rows = [[f"T{s}", task_in.get(s, "-")] for s in range(1, num_slots + 1)]
+    return tabulate(rows, headers=["Slot", "Task"], tablefmt="grid")
 
 
 def format_schedule_proof(
@@ -156,7 +156,7 @@ def format_grid(
         cleaned: Labels already cleaned, drawn as ``dk``.
 
     Returns:
-        Multi-line grid text, row 0 at the top.
+        Grid table text with row/column numbers, row 0 at the top.
     """
     cells: dict[State, str] = {}
     for state in path or []:
@@ -167,13 +167,18 @@ def format_grid(
         cells[cell] = label.lower() if label in cleaned else label
     cells[grid.charger] = "C"
 
-    width = 3
-    header = " " * width + "".join(f"{c:>{width}}" for c in range(grid.cols))
-    lines = [header]
-    for r in range(grid.rows):
-        row = "".join(f"{cells.get((r, c), '.'):>{width}}" for c in range(grid.cols))
-        lines.append(f"{r:>{width}}{row}")
-    return "\n".join(lines)
+    # tabulate pads every column to the same width, so cells line up even
+    # when labels have two digits (D10) or the grid is wide.
+    rows = [
+        [cells.get((r, c), ".") for c in range(grid.cols)] for r in range(grid.rows)
+    ]
+    return tabulate(
+        rows,
+        headers=[str(c) for c in range(grid.cols)],
+        showindex=range(grid.rows),
+        tablefmt="grid",
+        stralign="center",
+    )
 
 
 def _stop(label: str) -> str:
