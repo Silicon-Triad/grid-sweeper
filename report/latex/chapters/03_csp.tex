@@ -1,4 +1,5 @@
 % !TEX root = ../main.tex
+\newpage
 \section{CSP Formulation and Implementation}
 
 The formulation (variables, domains, three constraint types) is given in Section~1.
@@ -21,7 +22,6 @@ consistency). If any domain becomes empty, it returns \code{None} at once.
     every \emph{already assigned} variable: no shared slot (exclusivity) and correct order for any
     precedence pair between them. Constraints with unassigned variables are left for forward
     checking.
-  \newpage
   \item \code{forward\_check} copies the domains and, for each unassigned variable, removes every
     slot that would clash with the new assignment (same slot, or wrong side of a precedence pair).
     It returns the pruned copy, or \code{None} if some domain becomes empty (a dead end found early).
