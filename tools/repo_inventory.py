@@ -358,7 +358,7 @@ def build_tree(files: list[str], rmap: dict[str, str]) -> str:
 
 
 def category_of(rel: str) -> str:
-    """Pick the A.2 category of a file.
+    """Pick the B.2 category of a file.
 
     Args:
         rel: Repository-relative path.
@@ -373,7 +373,7 @@ def category_of(rel: str) -> str:
 
 
 def files_table(files: list[str], rmap: dict[str, str]) -> str:
-    """Build the A.2 table (files grouped by category).
+    """Build the B.2 table (files grouped by category).
 
     Args:
         files: Tracked paths.
@@ -540,7 +540,7 @@ def count_tests(rel: str) -> int:
 
 
 def code_table(files: list[str], rmap: dict[str, str]) -> str:
-    """Build the A.3 code-reference table.
+    """Build the B.3 code-reference table.
 
     Args:
         files: Tracked paths.
@@ -612,7 +612,7 @@ def _glue_headings(tex: str) -> str:
 
 
 def build() -> str:
-    """Assemble the generated LaTeX of appendix sections A.1 to A.3.
+    """Assemble the generated LaTeX of appendix sections B.1 to B.3.
 
     Returns:
         The full content of ``inventory_data.tex``.
