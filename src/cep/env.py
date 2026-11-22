@@ -146,8 +146,10 @@ _CELL_RE = re.compile(r"\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)")
 def _numbered_lines(text: str) -> list[tuple[int, str]]:
     """Split text into ``(line_number, stripped_line)`` pairs.
 
-    Trailing blank lines are dropped; ``splitlines`` also handles Windows
-    (CRLF) line endings (DEC-08).
+    Blank and whitespace-only lines are dropped wherever they are (DEC-08,
+    revised #70): no item of either format is ever an empty line, so a blank
+    line carries no meaning. ``splitlines`` also handles Windows (CRLF) line
+    endings. The original line numbers are kept for error messages.
 
     Args:
         text: Whole file content.
@@ -155,10 +157,11 @@ def _numbered_lines(text: str) -> list[tuple[int, str]]:
     Returns:
         1-based line numbers paired with whitespace-stripped lines.
     """
-    lines = [(i, line.strip()) for i, line in enumerate(text.splitlines(), start=1)]
-    while lines and not lines[-1][1]:
-        lines.pop()
-    return lines
+    return [
+        (i, line.strip())
+        for i, line in enumerate(text.splitlines(), start=1)
+        if line.strip()
+    ]
 
 
 class _LineReader:
@@ -188,7 +191,7 @@ class _LineReader:
         return InputError(f"{self.source}: line {lineno}: {problem}")
 
     def next(self, what: str) -> tuple[int, str]:
-        """Return the next line; blank lines between items are errors (DEC-08).
+        """Return the next non-blank line (blank lines are dropped, DEC-08).
 
         Args:
             what: Description of the expected item, for the error message.
@@ -197,21 +200,14 @@ class _LineReader:
             ``(line_number, stripped_line)``.
 
         Raises:
-            InputError: If the file ended or the line is blank.
+            InputError: If the file ended.
         """
         if self.pos >= len(self.lines):
             last = self.lines[-1][0] if self.lines else 0
             raise self.error(last + 1, f"missing {what} (file ended)")
         lineno, line = self.lines[self.pos]
         self.pos += 1
-        if not line:
-            raise self.error(lineno, f"expected {what}, found a blank line")
         return lineno, line
-
-    def skip_empty_line(self) -> None:
-        """Consume one blank line if it is next (empty tuple line, DEC-09)."""
-        if self.pos < len(self.lines) and not self.lines[self.pos][1]:
-            self.pos += 1
 
     def expect_end(self) -> None:
         """Raise if any line is left over (DEC-11, DEC-12).
@@ -297,7 +293,8 @@ def parse_environment(text: str, source: str = "Environment.txt") -> Grid:
     def read_cells(what: str, count: int) -> list[State]:
         """Read one tuple line of exactly ``count`` distinct in-bounds cells."""
         if count == 0:
-            reader.skip_empty_line()  # DEC-09: empty line or none at all
+            # DEC-09: an empty tuple line, if present, was already dropped
+            # with the other blank lines, so both layouts read the same.
             return []
         lineno, line = reader.next(f"{what} coordinates")
         cells = _parse_cells(line)
@@ -320,8 +317,13 @@ def parse_environment(text: str, source: str = "Environment.txt") -> Grid:
             other, other_line = seen[cell]
             if other == what:
                 raise reader.error(lineno, f"duplicate {what} cell {cell}")
+            # Spec §4: "The charging station, dirty locations, and obstacles
+            # must occupy different cells." (DEC-11)
             raise reader.error(
-                lineno, f"{what} cell {cell} overlaps {other} cell (line {other_line})"
+                lineno,
+                f"{what} cell {cell} overlaps {other} cell (line {other_line});"
+                " spec §4: charging station, dirty locations and obstacles"
+                " must occupy different cells",
             )
         seen[cell] = (what, lineno)
 
@@ -446,10 +448,9 @@ def parse_schedule(text: str, grid: Grid, source: str = "Schedule.txt") -> Const
         slot = int(match[1])
         if not 1 <= slot <= num_slots:
             raise reader.error(lineno, f"slot {slot_text} outside T1..T{num_slots}")
-        # Two limits for one task could disagree; latest holds one (DEC-12).
-        if task in latest:
-            raise reader.error(lineno, f"second latest-slot constraint for {task}")
-        latest[task] = slot
+        # Both limits must hold, so the tighter one is exactly equivalent
+        # (DEC-12, revised #70).
+        latest[task] = min(slot, latest.get(task, slot))
 
     reader.expect_end()
 

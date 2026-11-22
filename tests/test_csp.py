@@ -9,12 +9,19 @@ import pytest
 
 from cep.csp import (
     backtracking_search,
+    backtracking_search_with_stats,
     forward_check,
     is_consistent,
     order_domain_values,
     select_unassigned_variable,
 )
-from cep.env import Constraints, initial_domains, load_environment, load_schedule
+from cep.env import (
+    Constraints,
+    initial_domains,
+    load_environment,
+    load_schedule,
+    parse_schedule,
+)
 
 DATA = Path(__file__).resolve().parent.parent / "data"
 
@@ -277,3 +284,71 @@ def test_backtracking_matches_brute_force():  # REQ-CSP-09, REQ-CSP-11, REQ-CSP-
         assert (a is not None) == brute_force_feasible(c), c
         if a is not None:
             assert_valid(a, c)
+
+
+# --- Backtracking stats and demo (REQ-CSP-17, REQ-CSP-18, DEC-16, #70) ---
+
+
+# Smallest feasible schedule found on our own grid (5 tasks) that makes the
+# solver hit a dead end after recursing; same text as the notebook demo.
+DEMO_SCHEDULE = "5\n3\n(D1,D2)\n(D3,D1)\n(D5,D3)\n0\n"
+
+
+def _solve_with_stats(c):
+    return backtracking_search_with_stats(list(c.variables), initial_domains(c), c)
+
+
+def test_csp_demo_schedule_backtracks_and_is_valid():
+    grid = load_environment(DATA / "Environment.txt")
+    c = parse_schedule(DEMO_SCHEDULE, grid)
+    assignment, stats = _solve_with_stats(c)
+    assert assignment is not None
+    assert_valid(assignment, c)
+    assert stats["backtracks"] >= 1
+    assert stats["values_restored"] >= 1
+
+
+def test_csp_stats_invariants_on_random_problems():
+    rng = random.Random(70)
+    for _ in range(300):
+        n = rng.randint(2, 5)
+        slots = rng.randint(n, n + 2)
+        labels = [f"D{i}" for i in range(1, n + 1)]
+        pairs = list(itertools.permutations(labels, 2))
+        prec = rng.sample(pairs, rng.randint(0, min(3, len(pairs))))
+        latest = {
+            t: rng.randint(1, slots) for t in rng.sample(labels, rng.randint(0, 2))
+        }
+        c = make(n, slots, prec, latest)
+        assignment, stats = _solve_with_stats(c)
+        # Restored values are a subset of pruned ones, and only an abandoned
+        # branch (a backtrack) gives values back (REQ-CSP-17).
+        assert 0 <= stats["values_restored"] <= stats["values_pruned"]
+        assert (stats["values_restored"] > 0) <= (stats["backtracks"] > 0)
+        assert stats["fc_rejections"] <= stats["assignments_tried"]
+        assert stats["backtracks"] <= stats["assignments_tried"]
+        if assignment is not None:
+            assert_valid(assignment, c)
+            # One kept assignment per variable on the successful path.
+            assert stats["assignments_tried"] - stats["fc_rejections"] - (
+                stats["backtracks"]
+            ) == len(labels)
+        assert assignment == backtracking_search(
+            list(c.variables), initial_domains(c), c
+        )
+
+
+@pytest.mark.parametrize(
+    "env, sched",
+    [
+        ("Environment.txt", "Schedule.txt"),
+        ("Environment_Sample.txt", "Schedule_Sample.txt"),
+    ],
+)
+def test_csp_stats_version_matches_frozen(env, sched):
+    grid = load_environment(DATA / env)
+    c = load_schedule(DATA / sched, grid)
+    frozen = backtracking_search(list(c.variables), initial_domains(c), c)
+    with_stats, _ = _solve_with_stats(c)
+    assert frozen is not None
+    assert with_stats == frozen

@@ -1,7 +1,7 @@
 % !TEX root = ../main.tex
 \section{Testing and Validation}
 
-We ran the notebook end to end on three file pairs (spec §8.2). For each run, the configuration is
+We ran the notebook end to end on three file pairs (spec §8.2), plus run 3b, a CSP failure. For each run, the configuration is
 the content of the two input files, shown as a screenshot of the files as read from disk. The output
 is shown in three screenshots of the notebook cell: the parsed grid with the CSP schedule and its
 constraint check, then the integration output for UCS, then for \astar.
@@ -133,10 +133,58 @@ and states that the robot did not return to the charger. The final grid shows D5
 \end{figure}
 \figcenterend
 
+\newpage
+\subsection{Test run 3b: infeasible schedule (own \code{Environment.txt}, inline schedule)}
+This supplementary run exercises the CSP-failure branch: \code{Schedule\_Error.txt} is feasible, so
+run 3 shows a search failure instead. Run 3b uses our own environment and a schedule given inline in
+the notebook (5 slots, D1 before D2 \emph{and} D2 before D1), a precedence cycle
+(Figure~\ref{fig:run3b-config}). No assignment satisfies both constraints, so the solver returns no
+assignment and the notebook prints ``No feasible schedule: the CSP solver reports failure.''
+(Figure~\ref{fig:run3b-schedule}). The integration then runs no search (\code{(no search run)}) and
+reports \code{FAILURE: CSP solver found no feasible schedule}, with nothing cleaned, total moves 0,
+total cost 0, and the robot stayed at the charger, for both UCS and \astar{}
+(Figures~\ref{fig:run3b-ucs} and~\ref{fig:run3b-astar}).
+
+\figcenterbegin
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{run3b_config.png}
+\caption{Test run 3b (infeasible schedule): configuration, the environment file and the inline schedule.}
+\label{fig:run3b-config}
+\end{figure}
+\figcenterend
+
+\figcenterbegin
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{run3b_schedule.png}
+\caption{Test run 3b (infeasible schedule): parsed grid, CSP result: no feasible schedule.}
+\label{fig:run3b-schedule}
+\end{figure}
+\figcenterend
+
+\figcenterbegin
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{run3b_ucs.png}
+\caption{Test run 3b (infeasible schedule): integration output with UCS.}
+\label{fig:run3b-ucs}
+\end{figure}
+\figcenterend
+
+\figcenterbegin
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{run3b_astar.png}
+\caption{Test run 3b (infeasible schedule): integration output with \astar.}
+\label{fig:run3b-astar}
+\end{figure}
+\figcenterend
+
 
 \newpage
 \subsection{Automated tests}
-{\emergencystretch=3em In addition to the three runs, \code{pytest} runs 94 tests (all passing).
+{\emergencystretch=3em In addition to the three runs, \code{pytest} runs 106 tests (all passing).
 They cover the parsers (valid files, the sample files, and each invalid-input rule), successors,
 path cost, the heuristic and both search algorithms (including start $=$ goal and no path; costs on
 many start/goal pairs of our grid are checked against a breadth-first-search distance), the CSP
@@ -146,3 +194,7 @@ an unreachable leg, an infeasible schedule) and the display. A seeded generator
 feasible/infeasible schedules; property-based tests (Hypothesis) check that the generated files
 parse and have the requested properties. Continuous integration runs lint, tests, robustness,
 interface checks, and a full execution of the notebook on every pull request.\par}
+
+\textbf{Input tolerance.} Blank lines anywhere and repeated latest-slot entries for one task (the
+smallest slot is kept) are accepted; overlapping cells, including a dirty cell on the charger, are
+rejected with a message citing spec §4 (\dec{08}, \dec{11}, \dec{12}).
