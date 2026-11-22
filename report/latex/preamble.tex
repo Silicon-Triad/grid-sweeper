@@ -27,12 +27,15 @@
 \fi
 \usepackage{amsmath,amssymb}
 
-\usepackage[a4paper,margin=2.2cm]{geometry}
+% headheight fits the two-line running header.
+\usepackage[a4paper,margin=2.2cm,top=\dimexpr 2.2cm+12pt\relax,headheight=30pt,headsep=18pt]{geometry}
 \usepackage{graphicx}
 \graphicspath{{figures/}{../figures/}{../screenshots/}}
 \usepackage{pdfpages}
 \usepackage{booktabs}
 \usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{fancyvrb} % command boxes in the run guide (Appendix A)
 \usepackage{float}
 \usepackage{caption}
 \captionsetup{font=small,labelfont=bf}
@@ -41,28 +44,46 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{xcolor}
-% Input files typeset verbatim from data/; long tuple lines wrap.
-\usepackage{fvextra}
-\fvset{fontsize=\small,breaklines=true,breakanywhere=true,frame=single,framesep=4pt}
 \usepackage[hidelinks]{hyperref}
 
 % Headings: 14 pt sections, 12 pt subsections (REQ-RPT-11).
 \usepackage{titlesec}
+\usepackage{titletoc}
 \titleformat{\section}{\fontsize{14}{17}\selectfont\bfseries}{\thesection.}{0.5em}{}
 \titleformat{\subsection}{\fontsize{12}{14}\selectfont\bfseries}{\thesubsection}{0.5em}{}
 \titlespacing*{\section}{0pt}{10pt}{4pt}
 \titlespacing*{\subsection}{0pt}{8pt}{3pt}
 
-% Page numbers in the footer; the rubric page (page 1) has none.
+% Running header (two lines, left and right, no rule) and footer (course code
+% left, "x of y" centred, roll numbers right). The rubric page (page 1) is inserted
+% by \includepdf, which uses the empty page style, so it has neither.
+% Page numbering starts at 2 there, so the total is \LastPage (the page count).
+\usepackage{lastpage}
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
-\fancyfoot[C]{\thepage}
+\fancyhead[L]{\small\begin{tabular}[t]{@{}l@{}}NED University of Engineering and Technology\\
+  Department of Computer \& Information Systems Engineering\end{tabular}}
+\fancyhead[R]{\small\begin{tabular}[t]{@{}r@{}}Course: CS\textendash 323\\
+  Semester: Fall 2026\end{tabular}}
+% Three overlaid boxes so the middle item is centred on the page, not on the
+% space left between the side items.
+\fancyfoot[C]{\small\makebox[\headwidth][c]{\thepage{} of \pageref{LastPage}}%
+  \hspace{-\headwidth}\makebox[\headwidth][l]{CS-240-}%
+  \hspace{-\headwidth}\makebox[\headwidth][r]{-35, -39, -45, -47}}
 \renewcommand{\headrulewidth}{0pt}
 
+% Slightly looser body line spacing (default 1.0).
+\linespread{1.05}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{4pt}
 
 \newcommand{\astar}{A\textsuperscript{*}}
 \newcommand{\code}[1]{\texttt{#1}}
 \newcommand{\dec}[1]{DEC-#1}
+
+% Vertically centre a figure (image + caption) in the free space left on its page.
+% \figcenterbegin / \figcenterend wrap a [H] figure; \vspace* keeps the glue at a page top.
+\newcommand{\figcenterbegin}{\vspace*{\fill}}
+% The clearpage ends the page right after the figure, so the bottom stretch is kept.
+\newcommand{\figcenterend}{\vspace*{\fill}\clearpage}

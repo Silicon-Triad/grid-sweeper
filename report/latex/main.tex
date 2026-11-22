@@ -6,21 +6,59 @@
 
 % Page 1: the grading rubric with all four members filled in serves as the title
 % page; no other title page (spec §8.2, REQ-RPT-10). Regenerate: tools/fill_rubric.py
-\includepdf[pages=1,fitpaper]{figures/rubric_filled.pdf}
+% \includepdf[pages=1,fitpaper]{figures/rubric_filled.pdf}
 
-\setcounter{page}{2}
-{\centering
-{\fontsize{14}{17}\selectfont\bfseries Intelligent Vacuum-Cleaning Robot: Graph Search and CSP Scheduling\par}
-\vspace{2pt}
-CS-323 Artificial Intelligence, Complex Engineering Problem, TE Batch 2024, Fall 2026\\
-Muhammad Ashar Khan (CS-24035), Huzaifa Hanif (CS-24039), Muhammad Ahmed Qazi (CS-24045),
-Mujtaba Jawaid Rao (CS-24047). Notebook: \code{CS24045.ipynb}\par}
+% Page 1: table of contents (numbering starts here; the rubric is added separately).
+\renewcommand{\contentsname}{Table of Contents}
+% Main headings: solid rule to the page number; sub-items: dotted leader.
+\titlecontents{section}[1.6em]{\addvspace{8pt}\bfseries}{\contentslabel{1.6em}}{\hspace*{-1.6em}}%
+  {\hspace{4pt}\leaders\hrule height 0.4pt\hfill\hspace{4pt}\contentspage}
+\titlecontents{subsection}[3.8em]{\addvspace{1pt}}{\contentslabel{2.2em}}{\hspace*{-2.2em}}%
+  {\hspace{4pt}\titlerule*[0.5em]{.}\hspace{4pt}\contentspage}
+% Same solid rule as the opening block, between the heading and the listing.
+\makeatletter
+\renewcommand\tableofcontents{\section*{\contentsname}\vspace{-4pt}%
+  \noindent\rule{\linewidth}{0.6pt}\par\@starttoc{toc}}
+\makeatother
+\tableofcontents
+\clearpage
+
+% Opening block, on the same page as Section 1 (no title page, spec §8.2).
+{\raggedright
+\noindent\rule{\linewidth}{0.6pt}\par
 \vspace{6pt}
-
-Design choices the specification leaves open are team decisions, recorded in our decision log
-as \dec{01}--\dec{15}. They are cited by ID below and are not part of the specification.
+{\fontsize{11}{13}\selectfont Complex Engineering Problem\par}
+\vspace{4pt}
+{\fontsize{14}{17}\selectfont\bfseries Intelligent Vacuum-Cleaning Robot: Graph Search and CSP Scheduling\par}
+\vspace{10pt}
+% Dotted grey divider between the title and the team list.
+{\color{black!50}\noindent\leaders\hbox to 4pt{\hss\rule{1pt}{1pt}\hss}\hfill\null\par}
+\vspace{10pt}
+{\fontsize{11}{13}\selectfont
+\textbf{Team Members:}\par
+\vspace{-2pt}
+\begin{itemize}[itemsep=5pt,topsep=2pt,parsep=0pt,leftmargin=1.4em]
+  \item Muhammad Ashar Khan (CS-24035)
+  \item Huzaifa Hanif (CS-24039)
+  \item Muhammad Ahmed Qazi (CS-24045)
+  \item Mujtaba Jawaid Rao (CS-24047)
+\end{itemize}
+\vspace{6pt}
+\textbf{Notebook:} \code{CS24045.ipynb}\par
+\vspace{4pt}
+\textbf{To run the notebook, see \hyperref[app:run]{Appendix~A}.}\par
+\vspace{10pt}
+\itshape Design choices the specification leaves open are team decisions, recorded in our
+decision log as \dec{01} to \dec{15}. They are cited by ID below and are not part of the
+specification.\par}
+\vspace{6pt}
+\noindent\rule{\linewidth}{0.6pt}\par}
 
 \input{chapters/01_problem}
+% From Section 2 on, more space above each section heading (Section 1 keeps the default).
+\titlespacing*{\section}{0pt}{24pt}{4pt}
+% From Section 2 on, more space above each section heading (Section 1 keeps the default).
+\titlespacing*{\section}{0pt}{24pt}{4pt}
 \input{chapters/02_search}
 \input{chapters/03_csp}
 \input{chapters/04_integration}
@@ -29,5 +67,12 @@ as \dec{01}--\dec{15}. They are cited by ID below and are not part of the specif
 \input{chapters/07_discussion}
 \input{chapters/08_references}
 \input{chapters/09_genai}
+
+% Appendix after the Generative AI Use Declaration (Section 9).
+\appendix
+\newpage
+\input{appendices/A_run_guide}
+\newpage
+\input{appendices/B_inventory}
 
 \end{document}
