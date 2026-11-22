@@ -21,6 +21,17 @@ each cell is expanded at most once. A node counts as expanded when its successor
 \code{(None, None, nodes\_expanded)} when no path exists; for start $=$ goal it returns
 \code{([start], 0, 0)}. An unknown algorithm name raises \code{ValueError}.
 
+\textbf{Heuristic choice.} For \astar{} we use Manhattan distance,
+$h(n) = |row_n - row_{goal}| + |col_n - col_{goal}|$ (spec §5.5; \dec{02}). It is admissible:
+each move is UP, DOWN, LEFT or RIGHT at cost 1, so one move reduces the Manhattan distance by at
+most 1, and obstacles can only lengthen the real path. Hence $h(n)$ never exceeds the true remaining
+cost. It is also consistent: for any move from $n$ to a neighbour $n'$, $h(n) \le 1 + h(n')$, and
+$h(goal) = 0$. Because our \astar{} is a graph search with an explored set, consistency guarantees
+that each cell is expanded first along a cheapest path. So \astar{} returns an optimal path with the
+same cost as UCS, without reopening cells. Among admissible options it is the most informed:
+Euclidean distance and $h = 0$ are never larger, so they would make \astar{} expand more nodes, and
+$h = 0$ reduces \astar{} to UCS.
+
 \begin{algorithm}[H]
 \caption{Best-first graph search shared by UCS and \astar}
 \begin{algorithmic}[1]
@@ -50,14 +61,3 @@ each cell is expanded at most once. A node counts as expanded when its successor
 \end{algorithm}
 
 UCS is this procedure with $h \equiv 0$. \astar{} uses \code{heuristic(state, goal\_state)}.
-
-\textbf{Heuristic choice.} For \astar{} we use Manhattan distance,
-$h(n) = |row_n - row_{goal}| + |col_n - col_{goal}|$ (spec §5.5; \dec{02}). It is admissible:
-each move is UP, DOWN, LEFT or RIGHT at cost 1, so one move reduces the Manhattan distance by at
-most 1, and obstacles can only lengthen the real path. Hence $h(n)$ never exceeds the true remaining
-cost. It is also consistent: for any move from $n$ to a neighbour $n'$, $h(n) \le 1 + h(n')$, and
-$h(goal) = 0$. Because our \astar{} is a graph search with an explored set, consistency guarantees
-that each cell is expanded first along a cheapest path. So \astar{} returns an optimal path with the
-same cost as UCS, without reopening cells. Among admissible options it is the most informed:
-Euclidean distance and $h = 0$ are never larger, so they would make \astar{} expand more nodes, and
-$h = 0$ reduces \astar{} to UCS.

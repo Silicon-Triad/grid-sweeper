@@ -34,6 +34,8 @@
 \usepackage{pdfpages}
 \usepackage{booktabs}
 \usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{fancyvrb} % command boxes in the run guide (Appendix A)
 \usepackage{float}
 \usepackage{caption}
 \captionsetup{font=small,labelfont=bf}
@@ -46,6 +48,7 @@
 
 % Headings: 14 pt sections, 12 pt subsections (REQ-RPT-11).
 \usepackage{titlesec}
+\usepackage{titletoc}
 \titleformat{\section}{\fontsize{14}{17}\selectfont\bfseries}{\thesection.}{0.5em}{}
 \titleformat{\subsection}{\fontsize{12}{14}\selectfont\bfseries}{\thesubsection}{0.5em}{}
 \titlespacing*{\section}{0pt}{10pt}{4pt}
@@ -70,9 +73,17 @@
   \hspace{-\headwidth}\makebox[\headwidth][r]{-35, -39, -45, -47}}
 \renewcommand{\headrulewidth}{0pt}
 
+% Slightly looser body line spacing (default 1.0).
+\linespread{1.05}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{4pt}
 
 \newcommand{\astar}{A\textsuperscript{*}}
 \newcommand{\code}[1]{\texttt{#1}}
 \newcommand{\dec}[1]{DEC-#1}
+
+% Vertically centre a figure (image + caption) in the free space left on its page.
+% \figcenterbegin / \figcenterend wrap a [H] figure; \vspace* keeps the glue at a page top.
+\newcommand{\figcenterbegin}{\vspace*{\fill}}
+% The clearpage ends the page right after the figure, so the bottom stretch is kept.
+\newcommand{\figcenterend}{\vspace*{\fill}\clearpage}

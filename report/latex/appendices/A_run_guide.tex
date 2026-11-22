@@ -1,0 +1,84 @@
+% !TEX root = ../main.tex
+\section[\texorpdfstring{\protect\fbox{\strut Quick Guide: Running the Notebook}\protect\hspace{6pt}\protect\colorbox{black}{\protect\color{white}\protect\bfseries\ START HERE\ }}{Quick Guide: Running the Notebook}]{Quick Guide: Running the Notebook}
+\label{app:run}
+
+This guide runs \code{CS24045.ipynb} from the submission \code{.zip} on a clean machine. It needs
+Python 3.11 or newer and an internet connection for \code{pip install}.
+
+\subsection{Files in the submission .zip}
+The \code{.zip} holds exactly these nine files in one flat folder. The notebook looks for its input
+files in its own folder (then \code{./data}, \code{../data}), so keep all files together and start
+Jupyter from that folder.
+
+\begingroup\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{File} & \textbf{Purpose} \\
+\midrule
+\code{CS24045.ipynb} & the notebook (code, explanations, all three test runs) \\
+\code{CS24045.pdf} & this report \\
+\code{Environment.txt}, \code{Schedule.txt} & input files of test run 1 (our own) \\
+\code{Environment\_Sample.txt}, \code{Schedule\_Sample.txt} & input files of test run 2 (provided sample) \\
+\code{Environment\_Error.txt}, \code{Schedule\_Error.txt} & input files of test run 3 (failure case) \\
+\code{requirements.txt} & dependencies needed to run the notebook (jupyter, matplotlib, tabulate) \\
+\bottomrule
+\end{tabularx}
+\endgroup
+
+\subsection{Windows 10/11 (PowerShell)}
+\begin{enumerate}[itemsep=2pt]
+\item Install Python 3.11 or newer from \code{python.org}. Tick ``Add python.exe to PATH''.
+\item Unzip the submission and open PowerShell in that folder.
+\item Create and activate a virtual environment:
+\begin{Verbatim}[frame=single,fontsize=\small]
+py -3 -m venv .venv
+.venv\Scripts\Activate.ps1
+\end{Verbatim}
+If PowerShell blocks the activation script, run this first (it only affects this window):
+\begin{Verbatim}[frame=single,fontsize=\small]
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+\end{Verbatim}
+\item Install the dependencies and start Jupyter:
+\begin{Verbatim}[frame=single,fontsize=\small]
+pip install -r requirements.txt
+jupyter notebook CS24045.ipynb
+\end{Verbatim}
+\item In the browser, choose \textbf{Kernel $\rightarrow$ Restart \& Run All}.
+\end{enumerate}
+VS Code alternative: open the folder, select the \code{.venv} interpreter as the kernel, and click
+\textbf{Run All}.
+
+\newpage
+\subsection{Linux (bash or zsh)}
+\begin{enumerate}[itemsep=2pt]
+\item Unzip the submission and open a terminal in that folder.
+\item Create and activate a virtual environment (fish: \code{source .venv/bin/activate.fish}):
+\begin{Verbatim}[frame=single,fontsize=\small]
+python3 -m venv .venv
+source .venv/bin/activate
+\end{Verbatim}
+\item Install the dependencies and start Jupyter:
+\begin{Verbatim}[frame=single,fontsize=\small]
+pip install -r requirements.txt
+jupyter notebook CS24045.ipynb
+\end{Verbatim}
+\item In the browser, choose \textbf{Kernel $\rightarrow$ Restart \& Run All}.
+\end{enumerate}
+On Debian or Ubuntu, if \code{venv} is missing: \code{sudo apt install python3-venv}.
+
+\subsection{What you should see}
+The notebook runs three test runs. Runs 1 and 2 end with \code{Status: SUCCESS} (total cost
+64 and 34). Run 3 ends with \code{FAILURE: no path from D4 (9, 5) to D5 (9, 0)}.
+This failure is intended: it is the failure-case test (Section~6).
+
+\subsection{Source repository}
+The full project is public at \code{https://github.com/Silicon-Triad/grid-sweeper}.
+\begin{Verbatim}[frame=single,fontsize=\small]
+git clone https://github.com/Silicon-Triad/grid-sweeper.git
+cd grid-sweeper
+pip install -r requirements.txt
+pytest tests/
+python tools/build_notebook.py --check
+\end{Verbatim}
+Where to look: \code{src/cep/} (the code), \code{tests/} (the test suite), \code{data/} (input
+files), \code{docs/decisions.md} (design decisions \dec{01}, \dec{02}, \dots).
