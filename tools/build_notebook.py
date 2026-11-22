@@ -130,10 +130,54 @@ assignment = backtracking_search(
 print(format_schedule_proof(assignment, constraints))
 """
 
+CSP_DEMO = """\
+# Backtracking demo (#70): inline schedule for our own grid, so no extra
+# input file is needed (spec §10.1).
+DEMO_SCHEDULE = \"\"\"\\
+5
+3
+(D1,D2)
+(D3,D1)
+(D5,D3)
+0
+\"\"\"
+demo = parse_schedule(DEMO_SCHEDULE, grid, source="demo schedule")
+demo_assignment, stats = backtracking_search_with_stats(
+    list(demo.variables), initial_domains(demo), demo
+)
+print(tabulate(stats.items(), headers=["counter", "value"], tablefmt="grid"))
+print(
+    f"{stats['backtracks']} backtrack(s): an assignment passed forward checking, "
+    f"but every value below it failed, so it was undone and "
+    f"{stats['values_restored']} of the {stats['values_pruned']} pruned values "
+    f"came back into the domains."
+)
+print()
+print(format_schedule_proof(demo_assignment, demo))
+"""
+
 INTEGRATION_RUN = """\
 for algorithm in ALGORITHMS:
     print(format_result(plan_and_execute(grid, constraints, algorithm), grid))
     print()
+"""
+
+RUN_3B = """\
+# Run 3b: our own environment + an inline cyclic schedule (D1 before D2 and
+# D2 before D1). The input is valid; the constraints have no solution.
+CYCLIC_SCHEDULE = "5\\n2\\n(D1,D2)\\n(D2,D1)\\n0\\n"
+print(f"Configuration: {ENV_FILE} + inline schedule:")
+print(CYCLIC_SCHEDULE)
+g = load_environment(find_file(ENV_FILE))
+c = parse_schedule(CYCLIC_SCHEDULE, g, source="inline schedule")
+print(format_grid(g))
+print(LEGEND)
+print()
+a = backtracking_search(list(c.variables), initial_domains(c), c)
+print(format_schedule_proof(a, c))
+for algorithm in ALGORITHMS:
+    print()
+    print(format_result(plan_and_execute(g, c, algorithm), g))
 """
 
 RUN_CASE = '''\
@@ -221,6 +265,8 @@ def cells() -> list[tuple[str, str]]:
         ("md", md("07_csp.md")),
         ("code", src("csp")),
         ("code", CSP_RUN),
+        ("md", md("07b_csp_demo.md")),
+        ("code", CSP_DEMO),
         ("md", md("08_integration.md")),
         ("code", src("integrate")),
         ("code", INTEGRATION_RUN),
@@ -235,6 +281,9 @@ def cells() -> list[tuple[str, str]]:
         ("md", md("14_run3.md")),
         ("code", "run_case(ERROR_ENV_FILE, ERROR_SCHEDULE_FILE)"),
         ("md", md("15_run3_shot.md")),
+        ("md", md("16_run3b.md")),
+        ("code", RUN_3B),
+        ("md", md("17_run3b_shot.md")),
     ]
 
 

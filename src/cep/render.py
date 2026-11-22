@@ -243,9 +243,16 @@ def format_result(result: "IntegrationResult", grid: Grid) -> str:
         status = "SUCCESS: all dirty locations cleaned, robot back at charger"
     else:
         left = [x for x in grid.dirty if x not in result.cleaned]
+        # With no search run (CSP failure) the robot never left the charger,
+        # so "did not return" would misdescribe it (#70).
+        where = (
+            "robot stayed at the charger"
+            if not result.legs
+            else "robot did not return to charger"
+        )
         status = (
             f"FAILURE: {result.reason}; cleaned {result.cleaned or 'none'}, "
-            f"not cleaned {left}, robot did not return to charger"
+            f"not cleaned {left}, {where}"
         )
     lines.append("Status: " + status)
     return "\n".join(lines)

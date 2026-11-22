@@ -20,6 +20,7 @@ from cep.integrate import (
     run_integration,
     schedule_from_assignment,
 )
+from cep.render import format_result
 
 DATA = Path(__file__).resolve().parent.parent / "data"
 
@@ -164,3 +165,11 @@ def test_integrate_real_csp_infeasible_run():
         assert result.cleaned == []
         assert result.complete_path == [grid.charger]
         assert result.total_cost == 0
+
+
+def test_integrate_csp_failure_display_says_robot_stayed():
+    grid = load_environment(DATA / "Environment.txt")
+    constraints = parse_schedule("5\n2\n(D1,D2)\n(D2,D1)\n0\n", grid)
+    text = format_result(integrate.plan_and_execute(grid, constraints, "ucs"), grid)
+    assert "robot stayed at the charger" in text
+    assert "did not return" not in text
