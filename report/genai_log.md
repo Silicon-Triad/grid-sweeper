@@ -44,3 +44,4 @@ report's "Generative AI Use Declaration" (spec §8.2).
 | 2026-11-22 | Qazi | Claude Code (Claude Opus 5.5) | Moved Qazi's notebook text edits (branch qazi-md-edits) into notebook/markdown/00_header.md and module docstrings; rebuilt notebook | #65 |
 | 2026-11-22 | Qazi | Claude Code (Claude Sonnet 5.5) | Committed final report/CS24045.pdf and packaged the submission bundle (CS24045.zip, built outside the repo) | #31 |
 | 2026-11-22 | Qazi | Claude Code (Claude Opus 5.5) | Final README for submission (overview, quick start, layout, report link) | #31 |
+| 2026-11-22 | Qazi | Claude Code (Claude Opus 5.5) | Notebook review fixes: blank-line/duplicate-latest parser tolerance, §4 overlap message, CSP backtracking stats + demo schedule (found by a throwaway search, not committed), real CSP-infeasible test + run 3b, scaling repeats=3, run 3b screenshot (throwaway Playwright script), report §3/§6/§9 prose (AI-written, declared), rebuilt PDF | #70 |

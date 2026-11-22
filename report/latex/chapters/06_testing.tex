@@ -1,7 +1,7 @@
 % !TEX root = ../main.tex
 \section{Testing and Validation}
 
-We ran the notebook end to end on three file pairs (spec §8.2). For each run, the configuration is
+We ran the notebook end to end on three file pairs (spec §8.2), plus run 3b, a CSP failure. For each run, the configuration is
 the content of the two input files, shown as a screenshot of the files as read from disk. The output
 is shown in three screenshots of the notebook cell: the parsed grid with the CSP schedule and its
 constraint check, then the integration output for UCS, then for \astar.
@@ -133,10 +133,29 @@ and states that the robot did not return to the charger. The final grid shows D5
 \end{figure}
 \figcenterend
 
+\newpage
+\subsection{Test run 3b: infeasible schedule (\code{Environment.txt} $+$ inline schedule)}
+Run 3 fails during navigation; run 3b fails in the CSP. It uses our own environment and a schedule
+given inline in the notebook (5 slots, D1 before D2 \emph{and} D2 before D1). The input is valid,
+but no assignment satisfies both precedence constraints. The solver returns no schedule, the
+notebook prints ``No feasible schedule: the CSP solver reports failure'', and the integration runs
+no search: for both algorithms the status is
+\code{FAILURE: CSP solver found no feasible schedule}, nothing is cleaned, 0 moves, and the robot
+stays at the charger (Figure~\ref{fig:run3b}).
+
+\figcenterbegin
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{run3b_csp_infeasible.png}
+\caption{Test run 3b (own environment, cyclic inline schedule): configuration and output.}
+\label{fig:run3b}
+\end{figure}
+\figcenterend
+
 
 \newpage
 \subsection{Automated tests}
-{\emergencystretch=3em In addition to the three runs, \code{pytest} runs 94 tests (all passing).
+{\emergencystretch=3em In addition to the runs, \code{pytest} runs 106 tests (all passing).
 They cover the parsers (valid files, the sample files, and each invalid-input rule), successors,
 path cost, the heuristic and both search algorithms (including start $=$ goal and no path; costs on
 many start/goal pairs of our grid are checked against a breadth-first-search distance), the CSP
@@ -146,3 +165,7 @@ an unreachable leg, an infeasible schedule) and the display. A seeded generator
 feasible/infeasible schedules; property-based tests (Hypothesis) check that the generated files
 parse and have the requested properties. Continuous integration runs lint, tests, robustness,
 interface checks, and a full execution of the notebook on every pull request.\par}
+
+\textbf{Input tolerance.} Blank lines anywhere and repeated latest-slot entries for one task (the
+smallest slot is kept) are accepted; overlapping cells, including a dirty cell on the charger, are
+rejected with a message citing spec §4 (\dec{08}, \dec{11}, \dec{12}).

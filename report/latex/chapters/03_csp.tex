@@ -69,3 +69,32 @@ On the sample files, the latest-slot filter leaves D2 and D3 with domain $\{1,2,
 MRV and on degree (one precedence neighbour each), so file order picks D2, and LCV places it in T1.
 The resulting schedule is D2$\to$T1, D1$\to$T2, D3$\to$T3, D4$\to$T4. The notebook prints each
 schedule together with a check of every constraint (Figures~\ref{fig:run1-schedule}, \ref{fig:run2-schedule} and~\ref{fig:run3-schedule}).
+
+\textbf{Backtracking demo.} \code{Schedule.txt} and the sample schedule are solved without a dead
+end, so they never show backtracking. To show it, \code{backtracking\_search\_with\_stats} runs the
+same solver (the frozen \code{backtracking\_search} calls it and drops the counters, \dec{16}) and
+counts its steps. A throwaway search over random schedules for our own grid found the smallest
+feasible schedule that makes it backtrack: 5 slots and the chain D5$\to$D3$\to$D1$\to$D2, no
+latest-slot limits. The notebook gives it inline (no extra input file). Table~\ref{tab:csp-demo}
+shows the counters from the notebook run. One assignment passed forward checking, but every value
+below it failed, so it was undone; the 8 values its forward check had pruned came back into the
+domains. The schedule found, D5$\to$T1, D3$\to$T2, D1$\to$T3, D2$\to$T4, D4$\to$T5, passes every
+constraint check.
+
+\begin{table}[H]
+\centering
+\caption{Search counters for the backtracking demo schedule (notebook output).}
+\label{tab:csp-demo}
+\begin{tabular}{@{}lrl@{}}
+\toprule
+Counter & Value & Meaning \\
+\midrule
+assignments\_tried & 8 & values assigned after the consistency check \\
+fc\_rejections & 2 & of these, rejected at once by forward checking \\
+backtracks & 1 & undone after the whole subtree failed \\
+values\_pruned & 22 & removed by successful forward checks \\
+values\_restored & 8 & of these, restored when their branch was abandoned \\
+\bottomrule
+\end{tabular}
+\end{table}
+
