@@ -2,10 +2,10 @@
 
 | Name | Roll number |
 |---|---|
+| Muhammad Ashar Khan | CS-24035 |
+| Huzaifa Hanif | CS-24039 |
 | Muhammad Ahmed Qazi | CS-24045 |
 | Mujtaba Jawaid Rao | CS-24047 |
-| Huzaifa Hanif | CS-24039 |
-| Muhammad Ashar Khan | CS-24035 |
 
 The robot plans **when** to clean each dirty cell with a CSP (time slots, precedence,
 latest-slot and slot-exclusivity constraints) and **how** to get there with graph search
