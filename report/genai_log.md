@@ -42,3 +42,4 @@ report's "Generative AI Use Declaration" (spec §8.2).
 | 2026-11-22 | Qazi | Claude Code (Claude Sonnet 5.5) | Repository inventory appendix (A) + tools/repo_inventory.py; AI declaration kept as Section 9 before the appendix | #30 |
 | 2026-11-22 | Qazi | Claude Code (Claude Sonnet 5.5) | Run-guide appendix A (Linux steps verified in a fresh venv), repository inventory moved to appendix B, TOC marker for A, report/submission/requirements.txt | #30 #31 |
 | 2026-11-22 | Qazi | Claude Code (Claude Opus 5.5) | Moved Qazi's notebook text edits (branch qazi-md-edits) into notebook/markdown/00_header.md and module docstrings; rebuilt notebook | #65 |
+| 2026-11-22 | Qazi | Claude Code (Claude Sonnet 5.5) | Committed final report/CS24045.pdf and packaged the submission bundle (CS24045.zip, built outside the repo) | #31 |
