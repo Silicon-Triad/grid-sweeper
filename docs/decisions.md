@@ -170,3 +170,13 @@ comes from a `spec-question` issue, is labelled `design-decision`, and is
 - **Rationale:** Shows where the robot got stuck; the display (#24) prints the failure reason. `success` alone decides success (DEC-04).
 - **Affects REQ-IDs:** REQ-INT-05, REQ-INT-07
 - **Decided by / date:** Qazi, 2026-11-21
+
+### DEC-16 — Backtracking statistics for the CSP demo — **DECIDED**
+- **Issue:** #70
+- **Spec reference:** §6.5 "backtrack when an assignment leads to failure" / "Any domain values removed during forward checking must be restored when backtracking"; §8.2 — the spec does not ask for counters.
+- **Question:** How can the notebook show backtracking and domain restoration without changing the frozen `backtracking_search`?
+- **Options considered:** change the frozen function to return stats; separate public function sharing one core; print tracing
+- **Decision:** Add `backtracking_search_with_stats(variables, domains, constraints) -> (assignment | None, stats)`. `backtracking_search` calls it and drops the stats, so both always return the same assignment; the frozen signature and behaviour are unchanged. Counters: `assignments_tried`, `fc_rejections` (forward check emptied a domain at once), `backtracks` (assignment undone after its whole subtree failed), `values_pruned` (removed by successful forward checks), `values_restored` (pruned values given back when their branch was abandoned). The counter names and definitions are a team choice, not spec values. The notebook demo schedule is the smallest feasible schedule found on our own grid by a throwaway search over random schedules that makes the solver backtrack (it is given inline; no new data file, spec §10.1).
+- **Rationale:** Addition for demonstration only (review point #1); one shared core means the demo cannot drift from the graded solver.
+- **Affects REQ-IDs:** REQ-CSP-17, REQ-CSP-18
+- **Decided by / date:** Qazi, 2026-11-22

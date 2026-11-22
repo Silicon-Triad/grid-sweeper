@@ -256,19 +256,68 @@ def backtracking_search(variables, domains, constraints):
     Raises:
         ValueError: If ``variables`` and ``constraints.variables`` differ.
     """
+    assignment, _ = backtracking_search_with_stats(variables, domains, constraints)
+    return assignment
+
+
+def new_stats() -> dict[str, int]:
+    """Return zeroed search counters for ``backtracking_search_with_stats``.
+
+    Returns:
+        ``assignments_tried``: values that passed ``is_consistent`` and were
+        assigned; ``fc_rejections``: of those, how many forward checking
+        rejected at once (an empty domain); ``backtracks``: assignments
+        undone because every deeper branch failed (a dead end found only
+        after recursing); ``values_pruned``: domain values removed by
+        successful forward checks; ``values_restored``: of those, how many
+        came back because their branch was abandoned (REQ-CSP-17).
+    """
+    return {
+        "assignments_tried": 0,
+        "fc_rejections": 0,
+        "backtracks": 0,
+        "values_pruned": 0,
+        "values_restored": 0,
+    }
+
+
+def backtracking_search_with_stats(
+    variables: list[Label], domains: Domains, constraints: Constraints
+) -> tuple[Assignment | None, dict[str, int]]:
+    """Run ``backtracking_search`` and also return its search counters.
+
+    Same solver, same result: ``backtracking_search`` calls this function
+    and drops the counters (DEC-16). Added so the notebook can show
+    backtracking and domain restoration actually happening.
+
+    Args:
+        variables: CSP variables; must equal ``constraints.variables``.
+        domains: Initial domains (not modified).
+        constraints: Scheduling constraints.
+
+    Returns:
+        ``(assignment or None, stats)``; see ``new_stats`` for the keys.
+
+    Raises:
+        ValueError: If ``variables`` and ``constraints.variables`` differ.
+    """
     if set(variables) != set(constraints.variables):
         raise ValueError("variables must match constraints.variables")
 
+    stats = new_stats()
     start = {
         v: [s for s in domains[v] if _latest_ok(v, s, constraints)] for v in variables
     }
     if any(not values for values in start.values()):
-        return None
-    return _backtrack({}, start, constraints)
+        return None, stats
+    return _backtrack({}, start, constraints, stats), stats
 
 
 def _backtrack(
-    assignment: Assignment, domains: Domains, constraints: Constraints
+    assignment: Assignment,
+    domains: Domains,
+    constraints: Constraints,
+    stats: dict[str, int],
 ) -> Assignment | None:
     """Recursive step of ``backtracking_search``.
 
@@ -276,6 +325,7 @@ def _backtrack(
         assignment: Partial assignment, extended in place and undone on failure.
         domains: Domains after forward checking for ``assignment``.
         constraints: Scheduling constraints.
+        stats: Counters updated in place (see ``new_stats``).
 
     Returns:
         A complete assignment, or None if this branch has no solution.
@@ -287,11 +337,22 @@ def _backtrack(
         if not is_consistent(variable, value, assignment, constraints):
             continue
         assignment[variable] = value
+        stats["assignments_tried"] += 1
         pruned = forward_check(variable, value, assignment, domains, constraints)
-        if pruned is not None:
-            result = _backtrack(assignment, pruned, constraints)
+        if pruned is None:
+            stats["fc_rejections"] += 1
+        else:
+            # Values removed from the other tasks' domains by this check
+            # (``variable`` itself shrinking to [value] is not pruning).
+            removed = sum(
+                len(domains[v]) - len(pruned[v]) for v in domains if v != variable
+            )
+            stats["values_pruned"] += removed
+            result = _backtrack(assignment, pruned, constraints, stats)
             if result is not None:
                 return result
+            stats["backtracks"] += 1
+            stats["values_restored"] += removed
         # Backtrack: drop the value. ``domains`` was never changed, so the
         # values forward checking removed are back for the next try.
         del assignment[variable]
