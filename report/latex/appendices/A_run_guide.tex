@@ -15,7 +15,7 @@ Jupyter from that folder.
 \toprule
 \textbf{File} & \textbf{Purpose} \\
 \midrule
-\code{CS24045.ipynb} & the notebook (code, explanations, all three test runs) \\
+\code{CS24045.ipynb} & the notebook (code, explanations, all four test runs) \\
 \code{CS24045.pdf} & this report \\
 \code{Environment.txt}, \code{Schedule.txt} & input files of test run 1 (our own) \\
 \code{Environment\_Sample.txt}, \code{Schedule\_Sample.txt} & input files of test run 2 (provided sample) \\
@@ -67,9 +67,10 @@ jupyter notebook CS24045.ipynb
 On Debian or Ubuntu, if \code{venv} is missing: \code{sudo apt install python3-venv}.
 
 \subsection{What you should see}
-The notebook runs three test runs. Runs 1 and 2 end with \code{Status: SUCCESS} (total cost
+The notebook runs four test runs. Runs 1 and 2 end with \code{Status: SUCCESS} (total cost
 64 and 34). Run 3 ends with \code{FAILURE: no path from D4 (9, 5) to D5 (9, 0)}.
 This failure is intended: it is the failure-case test (Section~6).
+Run 4(3b) ends with \code{FAILURE: CSP solver found no feasible schedule}. This failure is also intended.
 
 \subsection{Source repository}
 The full project is public at \code{https://github.com/Silicon-Triad/grid-sweeper}.
