@@ -6,7 +6,14 @@ from types import MappingProxyType
 import pytest
 
 import cep.integrate as integrate
-from cep.env import ALGORITHMS, Constraints, Grid, load_environment, load_schedule
+from cep.env import (
+    ALGORITHMS,
+    Constraints,
+    Grid,
+    load_environment,
+    load_schedule,
+    parse_schedule,
+)
 from cep.integrate import (
     execute_schedule,
     plan_and_execute,
@@ -138,3 +145,22 @@ def test_integrate_uses_components(monkeypatch, env, sched):
     # One search per task plus the return leg, chained position to position.
     stops = [g.dirty[x] for x in result.schedule] + [g.charger]
     assert calls == list(zip([g.charger] + stops[:-1], stops, strict=True))
+
+
+def test_integrate_real_csp_infeasible_run():
+    """Real solver, no stubbing: a precedence cycle has no schedule (#70).
+
+    REQ-INT-07, REQ-CSP-12: failure is reported, no search runs (no legs),
+    and the robot never leaves the charger.
+    """
+    grid = load_environment(DATA / "Environment.txt")
+    constraints = parse_schedule("5\n2\n(D1,D2)\n(D2,D1)\n0\n", grid)
+    for algorithm in ALGORITHMS:
+        result = integrate.plan_and_execute(grid, constraints, algorithm)
+        assert result.success is False
+        assert result.reason == "CSP solver found no feasible schedule"
+        assert result.schedule == []
+        assert result.legs == []
+        assert result.cleaned == []
+        assert result.complete_path == [grid.charger]
+        assert result.total_cost == 0
