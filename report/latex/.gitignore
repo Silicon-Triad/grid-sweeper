@@ -1,0 +1,11 @@
+# Tectonic --keep-intermediates / --keep-logs output
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.xdv
+# Build output; the submitted copy is report/CS24045.pdf
+main.pdf
+# Times New Roman copies (licence: do not commit)
+fonts/

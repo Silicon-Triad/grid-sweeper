@@ -1,0 +1,68 @@
+% !TEX root = main.tex
+% Format rules (spec §8.2, REQ-RPT-11): Times New Roman, 11 pt body, 12 or 14 pt headings.
+
+\usepackage{iftex}
+\ifXeTeX
+  % Fonts are loaded by FILE NAME, never by family name: a name lookup makes
+  % Tectonic scan every system font via fontconfig, and it crashes on fonts
+  % with UTF-16 names (NulError in xetex_layout/fc.rs).
+  \usepackage{fontspec}
+  % Times New Roman: copy times.ttf, timesbd.ttf, timesi.ttf, timesbi.ttf into
+  % fonts/ (not committed: the font's licence forbids redistribution).
+  \IfFileExists{fonts/times.ttf}{%
+    \setmainfont{times.ttf}[Path=fonts/, BoldFont=timesbd.ttf,
+      ItalicFont=timesi.ttf, BoldItalicFont=timesbi.ttf]%
+  }{%
+    % Fallback: TeX Gyre Termes (Times clone) from the TeX bundle.
+    \typeout{WARNING: fonts/times.ttf missing, using TeX Gyre Termes}%
+    \setmainfont{texgyretermes}[Extension=.otf, UprightFont=*-regular,
+      BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]%
+  }
+  % Monospace by file name too, so fontspec never falls back to a name lookup.
+  \setmonofont{lmmono10-regular}[Extension=.otf]
+\else
+  % Overleaf with pdfLaTeX: Times clone.
+  \usepackage[T1]{fontenc}
+  \usepackage{newtxtext}
+\fi
+\usepackage{amsmath,amssymb}
+
+\usepackage[a4paper,margin=2.2cm]{geometry}
+\usepackage{graphicx}
+\graphicspath{{figures/}{../figures/}{../screenshots/}}
+\usepackage{pdfpages}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
+\usepackage{enumitem}
+\setlist{itemsep=1pt,topsep=3pt}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{xcolor}
+% Input files typeset verbatim from data/; long tuple lines wrap.
+\usepackage{fvextra}
+\fvset{fontsize=\small,breaklines=true,breakanywhere=true,frame=single,framesep=4pt}
+\usepackage[hidelinks]{hyperref}
+
+% Headings: 14 pt sections, 12 pt subsections (REQ-RPT-11).
+\usepackage{titlesec}
+\titleformat{\section}{\fontsize{14}{17}\selectfont\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\fontsize{12}{14}\selectfont\bfseries}{\thesubsection}{0.5em}{}
+\titlespacing*{\section}{0pt}{10pt}{4pt}
+\titlespacing*{\subsection}{0pt}{8pt}{3pt}
+
+% Page numbers in the footer; the rubric page (page 1) has none.
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+
+\newcommand{\astar}{A\textsuperscript{*}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\dec}[1]{DEC-#1}

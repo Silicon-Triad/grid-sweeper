@@ -1,0 +1,41 @@
+% !TEX root = ../main.tex
+\section{System Integration}
+
+\code{execute\_schedule(grid, charging\_station, schedule, algorithm)} connects the two parts.
+\code{plan\_and\_execute} first runs \code{backtracking\_search} on the parsed constraints. It then
+converts the assignment into the \code{schedule}: the task labels sorted by slot, so empty slots are
+skipped. Each label is mapped to its cell through \code{grid.dirty}. The integration only uses the
+outputs of the CSP and of \code{search}; the visiting order and the paths are never hard-coded.
+
+\begin{algorithm}[H]
+\caption{Executing the CSP schedule with graph search}
+\begin{algorithmic}[1]
+\Function{Execute-Schedule}{$grid, charger, schedule, algorithm$}
+  \State $stops \gets [\,grid.dirty[\ell] \text{ for } \ell \in schedule\,] + [charger]$
+  \State $current \gets charger$; \ $complete\_path \gets [charger]$; \ $total \gets 0$
+  \For{$target \in stops$}
+    \State $(path, cost, nodes) \gets \Call{Search}{grid, current, target, algorithm}$
+    \If{$path = \textit{None}$}
+      \State \Return $(complete\_path, total, \textit{False})$ \Comment{failure, \dec{15}}
+    \EndIf
+    \State $complete\_path \gets complete\_path + path[1{:}]$ \Comment{drop repeated first cell}
+    \State $total \gets total + cost$; \ $current \gets target$
+    \If{$target \neq charger$} mark $target$ cleaned
+    \EndIf
+  \EndFor
+  \State \Return $(complete\_path, total, \textit{True})$ \Comment{all cleaned, back at charger}
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+The grid is never changed; cleaned cells are tracked separately (\dec{06}). This way UCS and
+\astar{} can run one after the other on the same \code{Grid}. For each algorithm, the notebook output
+shows the schedule, the visit sequence, each leg's path with its cost and nodes expanded, the final
+grid (\code{*} path, \code{dk} cleaned), the total moves and cost, and the final status.
+
+\textbf{Failure handling (\dec{15}).} If a leg has no path, execution stops at that leg. It returns
+the path walked so far, its cost, and \code{success = False}. The status line names the unreachable
+leg, the tasks cleaned and not cleaned, and states that the robot did not return to the charger, so
+the system never claims success. If the CSP finds no schedule, no search is run: the path is
+\code{[charger]}, the cost is 0, and the run is reported as a failure. Input errors are caught and
+reported as \code{InputError} messages, so the notebook does not crash.
