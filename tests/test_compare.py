@@ -25,6 +25,8 @@ def test_scaling_and_table():  # REQ-CMP-02
     assert [r.cost for r in runs] == [4, 4, 10, 10]
     table = format_table(runs)
     assert "3x3" in table and "astar" in table
+    grid_lines = format_table(runs, tablefmt="grid").splitlines()
+    assert len({len(line) for line in grid_lines}) == 1  # columns aligned
 
 
 def test_midline_astar_expands_only_the_line():  # REQ-CMP-02

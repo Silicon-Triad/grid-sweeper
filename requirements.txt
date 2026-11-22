@@ -6,4 +6,5 @@ nbstripout>=0.7
 nbmake>=1.5
 jupyter>=1.0
 matplotlib>=3.8
+tabulate>=0.9
 ruff>=0.6
