@@ -3,13 +3,23 @@
 
 \usepackage{iftex}
 \ifXeTeX
-  % Tectonic / XeLaTeX: the real Times New Roman if installed (ttf-ms-fonts on Arch);
-  % otherwise TeX Gyre Termes, a Times clone shipped with every TeX bundle.
+  % Fonts are loaded by FILE NAME, never by family name: a name lookup makes
+  % Tectonic scan every system font via fontconfig, and it crashes on fonts
+  % with UTF-16 names (NulError in xetex_layout/fc.rs).
   \usepackage{fontspec}
-  \IfFontExistsTF{Times New Roman}
-    {\setmainfont{Times New Roman}}
-    {\setmainfont{TeX Gyre Termes}%
-     \typeout{WARNING: Times New Roman not found, using TeX Gyre Termes}}
+  % Times New Roman: copy times.ttf, timesbd.ttf, timesi.ttf, timesbi.ttf into
+  % fonts/ (not committed: the font's licence forbids redistribution).
+  \IfFileExists{fonts/times.ttf}{%
+    \setmainfont{times.ttf}[Path=fonts/, BoldFont=timesbd.ttf,
+      ItalicFont=timesi.ttf, BoldItalicFont=timesbi.ttf]%
+  }{%
+    % Fallback: TeX Gyre Termes (Times clone) from the TeX bundle.
+    \typeout{WARNING: fonts/times.ttf missing, using TeX Gyre Termes}%
+    \setmainfont{texgyretermes}[Extension=.otf, UprightFont=*-regular,
+      BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]%
+  }
+  % Monospace by file name too, so fontspec never falls back to a name lookup.
+  \setmonofont{lmmono10-regular}[Extension=.otf]
 \else
   % Overleaf with pdfLaTeX: Times clone.
   \usepackage[T1]{fontenc}
