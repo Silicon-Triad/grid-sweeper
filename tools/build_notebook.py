@@ -98,7 +98,7 @@ pair_runs = compare_pairs(grid, charger_pairs(grid), repeats=3)
 print(format_table(pair_runs, tablefmt="grid"))
 
 sizes = [5, 10, 20, 40]
-scale = {sc: scaling(sizes, repeats=1, scenario=sc) for sc in SCENARIOS}
+scale = {sc: scaling(sizes, repeats=3, scenario=sc) for sc in SCENARIOS}
 for sc, runs in scale.items():
     print(f"\\nScaling, open grids, {sc}:")
     print(format_table(runs, tablefmt="grid"))
