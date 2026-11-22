@@ -41,9 +41,6 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{xcolor}
-% Input files typeset verbatim from data/; long tuple lines wrap.
-\usepackage{fvextra}
-\fvset{fontsize=\small,breaklines=true,breakanywhere=true,frame=single,framesep=4pt}
 \usepackage[hidelinks]{hyperref}
 
 % Headings: 14 pt sections, 12 pt subsections (REQ-RPT-11).
@@ -53,12 +50,17 @@
 \titlespacing*{\section}{0pt}{10pt}{4pt}
 \titlespacing*{\subsection}{0pt}{8pt}{3pt}
 
-% Page numbers in the footer; the rubric page (page 1) has none.
+% Running header and "Page X of Y" footer. The rubric page (page 1) is inserted
+% by \includepdf, which uses the empty page style, so it has neither.
+% Page numbering starts at 2 there, so the total is \LastPage (the page count).
+\usepackage{lastpage}
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
-\fancyfoot[C]{\thepage}
-\renewcommand{\headrulewidth}{0pt}
+\fancyhead[L]{CS-323 AI \textemdash{} CEP Report}
+\fancyhead[R]{Group CS24045}
+\fancyfoot[C]{Page \thepage{} of \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
 
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{4pt}

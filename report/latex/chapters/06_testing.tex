@@ -2,7 +2,7 @@
 \section{Testing and Validation}
 
 We ran the notebook end to end on three file pairs (spec §8.2). For each run, the configuration is
-the content of the two input files, shown below as text exactly as read from disk. The output
+the content of the two input files, shown as a screenshot of the files as read from disk. The output
 is shown in three screenshots of the notebook cell: the parsed grid with the CSP schedule and its
 constraint check, then the integration output for UCS, then for \astar.
 
@@ -10,10 +10,12 @@ constraint check, then the integration output for UCS, then for \astar.
 The schedule is D1\dots D5 in T1\dots T5, with T6 empty, and all constraints are satisfied. Both
 algorithms clean all five cells and return to the charger: 64 moves, cost 64, status SUCCESS.
 
-\textbf{Configuration.} \code{Environment.txt}:
-\VerbatimInput{../../data/Environment.txt}
-\code{Schedule.txt}:
-\VerbatimInput{../../data/Schedule.txt}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{run1_config.png}
+\caption{Test run 1 (own files): configuration, the environment and schedule input files.}
+\label{fig:run1-config}
+\end{figure}
 
 \begin{figure}[H]
 \centering
@@ -41,10 +43,12 @@ algorithms clean all five cells and return to the charger: 64 moves, cost 64, st
 The schedule is T1:D2, T2:D1, T3:D3, T4:D4, and all constraints are satisfied. Both algorithms
 finish with 34 moves, cost 34, status SUCCESS.
 
-\textbf{Configuration.} \code{Environment\_Sample.txt}:
-\VerbatimInput{../../data/Environment_Sample.txt}
-\code{Schedule\_Sample.txt}:
-\VerbatimInput{../../data/Schedule_Sample.txt}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{run2_config.png}
+\caption{Test run 2 (sample files): configuration, the environment and schedule input files.}
+\label{fig:run2-config}
+\end{figure}
 
 \begin{figure}[H]
 \centering
@@ -76,10 +80,12 @@ path (69 nodes expanded). The system stops there and prints
 and states that the robot did not return to the charger. The final grid shows D5 still dirty
 (Figures~\ref{fig:run3-ucs} and~\ref{fig:run3-astar}).
 
-\textbf{Configuration.} \code{Environment\_Error.txt}:
-\VerbatimInput{../../data/Environment_Error.txt}
-\code{Schedule\_Error.txt}:
-\VerbatimInput{../../data/Schedule_Error.txt}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{run3_config.png}
+\caption{Test run 3 (error files): configuration, the environment and schedule input files.}
+\label{fig:run3-config}
+\end{figure}
 
 \begin{figure}[H]
 \centering
@@ -104,7 +110,7 @@ and states that the robot did not return to the charger. The final grid shows D5
 
 
 \subsection{Automated tests}
-In addition to the three runs, \code{pytest} runs 94 tests (all passing).
+{\emergencystretch=3em In addition to the three runs, \code{pytest} runs 94 tests (all passing).
 They cover the parsers (valid files, the sample files, and each invalid-input rule), successors,
 path cost, the heuristic and both search algorithms (including start $=$ goal and no path; costs on
 many start/goal pairs of our grid are checked against a breadth-first-search distance), the CSP
@@ -113,4 +119,4 @@ an unreachable leg, an infeasible schedule) and the display. A seeded generator
 (\code{tools/gen\_env.py}) produces random reachable/unreachable environments and
 feasible/infeasible schedules; property-based tests (Hypothesis) check that the generated files
 parse and have the requested properties. Continuous integration runs lint, tests, robustness,
-interface checks, and a full execution of the notebook on every pull request.
+interface checks, and a full execution of the notebook on every pull request.\par}

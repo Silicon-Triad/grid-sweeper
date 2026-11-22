@@ -1,13 +1,13 @@
 % !TEX root = ../main.tex
 \section{System Integration}
 
-\code{execute\_schedule(grid, charging\_station, schedule, algorithm)} connects the two parts.
-\code{plan\_and\_execute} first runs \code{backtracking\_search} on the parsed constraints. It then
+{\emergencystretch=3em \code{execute\_\allowbreak schedule(grid, charging\_\allowbreak station, schedule, algorithm)} connects the two parts.
+\code{plan\_\allowbreak and\_\allowbreak execute} first runs \code{backtracking\_search} on the parsed constraints. It then
 converts the assignment into the \code{schedule}: the task labels sorted by slot, so empty slots are
 skipped. Each label is mapped to its cell through \code{grid.dirty}. The integration only uses the
-outputs of the CSP and of \code{search}; the visiting order and the paths are never hard-coded.
+outputs of the CSP and of \code{search}; the visiting order and the paths are never hard-coded.\par}
 
-\begin{algorithm}[H]
+\begin{algorithm}[!htbp]
 \caption{Executing the CSP schedule with graph search}
 \begin{algorithmic}[1]
 \Function{Execute-Schedule}{$grid, charger, schedule, algorithm$}
