@@ -192,3 +192,55 @@ def test_env_rejects_invalid_environment_file(tmp_path):
 
     with pytest.raises(InputError):
         load_environment(error_file)
+
+
+# --- Input tolerance (DEC-08, DEC-11, DEC-12 revised #70; REQ-ENV-02, REQ-CSP-02)
+
+OWN_SCHEDULE_TEXT = (DATA / "Schedule.txt").read_text(encoding="utf-8")
+
+
+def _spread_blank_lines(text: str) -> str:
+    """Put a blank and a whitespace-only line between every pair of lines."""
+    return "\n \t\n\n".join(text.splitlines()) + "\n\n"
+
+
+def test_env_blank_lines_everywhere_parse_like_compact():
+    from cep.env import parse_schedule
+
+    compact = (DATA / "Environment.txt").read_text(encoding="utf-8")
+    grid = parse_environment(compact)
+    spread = parse_environment("\n\n" + _spread_blank_lines(compact))
+    assert spread == grid
+    assert parse_schedule(_spread_blank_lines(OWN_SCHEDULE_TEXT), grid) == (
+        parse_schedule(OWN_SCHEDULE_TEXT, grid)
+    )
+
+
+def test_env_zero_count_with_or_without_empty_line():
+    with_line = "4,4\n0\n\n0\n\n(0,0)\n"
+    without = "4,4\n0\n0\n(0,0)\n"
+    assert parse_environment(with_line) == parse_environment(without)
+
+
+def test_schedule_duplicate_latest_keeps_tighter_slot():
+    from cep.env import parse_schedule
+
+    grid = parse_environment(SAMPLE_ENV)
+    text = "4\n0\n3\n(D1,T4)\n(D1,T2)\n(D1,T3)\n"
+    assert parse_schedule(text, grid).latest == {"D1": 2}
+
+
+def test_schedule_duplicate_latest_still_checks_range_and_label():
+    from cep.env import parse_schedule
+
+    grid = parse_environment(SAMPLE_ENV)
+    with pytest.raises(InputError, match="outside"):
+        parse_schedule("4\n0\n2\n(D1,T2)\n(D1,T9)\n", grid)
+    with pytest.raises(InputError, match="unknown task"):
+        parse_schedule("4\n0\n2\n(D1,T2)\n(D7,T2)\n", grid)
+
+
+def test_env_dirty_on_charger_cites_spec_section_4():
+    text = "4,4\n0\n1\n(0,0)\n(0,0)\n"
+    with pytest.raises(InputError, match="§4"):
+        parse_environment(text)

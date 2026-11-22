@@ -97,6 +97,7 @@ comes from a `spec-question` issue, is labelled `design-decision`, and is
 - **Rationale:** Hidden assessment files may be hand-typed on any OS; whitespace carries no meaning in the format.
 - **Affects REQ-IDs:** REQ-ENV-02, REQ-CSP-02
 - **Decided by / date:** Qazi, 2026-11-18
+- **Revised 2026-11-22 (#70):** Blank and whitespace-only lines are ignored anywhere in both files (before, between and after items). Reason: notebook review — no item of either format is ever an empty line (counts, tuple lines with count > 0, pairs), so dropping blank lines cannot change the meaning of any file that was accepted before; it only accepts hand-typed files with spacing between sections. Consistent with DEC-09: the optional empty tuple line after a count of 0 is now simply one of the dropped blank lines, so both layouts still parse identically. Line numbers in error messages stay the original ones.
 
 ### DEC-09 — Tuple line when a count is 0 — **DECIDED**
 - **Issue:** #4, #5
@@ -127,6 +128,7 @@ comes from a `spec-question` issue, is labelled `design-decision`, and is
 - **Rationale:** Duplicate dirty cells would give two labels one cell; duplicate obstacles are harmless but almost certainly typos. Leaving reachability to search keeps "unreachable" a demonstrable runtime failure.
 - **Affects REQ-IDs:** REQ-ENV-02, REQ-ENV-06
 - **Decided by / date:** Qazi, 2026-11-18
+- **Revised 2026-11-22 (#70):** Overlap stays an error (dirty cell on the charger included) — it is a spec rule, not a team choice: §4 "The charging station, dirty locations, and obstacles must occupy different cells." The error message now cites §4. Blank lines after line 6 are ignored (DEC-08 revised); non-blank extra lines remain errors.
 
 ### DEC-12 — Schedule value checks — **DECIDED**
 - **Issue:** #5
@@ -137,6 +139,7 @@ comes from a `spec-question` issue, is labelled `design-decision`, and is
 - **Rationale:** Malformed references are input errors; well-formed but unsatisfiable constraints are infeasibility, which the error run must show the solver detecting.
 - **Affects REQ-IDs:** REQ-CSP-02, REQ-CSP-08, REQ-CSP-12
 - **Decided by / date:** Qazi, 2026-11-18
+- **Revised 2026-11-22 (#70):** Two or more latest-slot entries for one task are accepted; the smallest (tightest) slot is kept. Reason: notebook review — both limits must hold, and `slot ≤ a` and `slot ≤ b` is exactly `slot ≤ min(a, b)`, so nothing is lost. Each entry is still checked: unknown label or slot outside T1..Tn is an error.
 
 ### DEC-13 — Text parsers alongside file loaders — **DECIDED**
 - **Issue:** #4, #5
