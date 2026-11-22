@@ -37,3 +37,4 @@ report's "Generative AI Use Declaration" (spec §8.2).
 | 2026-11-22 | Qazi | Claude Code (Claude Opus 5.5) | Report §6: input files as verbatim text, outputs as separate per-algorithm screenshots (re-executed notebook); Tectonic font-loading fix | #28 #30 |
 | 2026-11-22 | Qazi | Claude Code (Claude Opus 5.5) | Built the report in Google Docs (CS-323 - OEL Report) via the Docs API: text, styles, tables, 11 images, landscape rubric page; AI-written prose declared in report §9 | #28 #29 #30 |
 | 2026-11-22 | Qazi | Claude Code (Claude Opus 5.5) | Switched grid, slot table and UCS vs A* tables to tabulate (render.py, compare.py, build_notebook.py, tests, requirements.txt) | #63 |
+| 2026-11-22 | Qazi | Claude Code (Claude Opus 5.5) | Moved Qazi's notebook text edits (branch qazi-md-edits) into notebook/markdown/00_header.md and module docstrings; rebuilt notebook | #65 |
