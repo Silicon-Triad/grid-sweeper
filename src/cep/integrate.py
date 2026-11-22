@@ -1,4 +1,6 @@
-"""Integration of CSP scheduling and graph-based search (spec §7). Owner: Qazi.
+"""Integration of CSP scheduling and graph-based search (spec §7).
+
+Owner: Muhammad Ahmed Qazi.
 
 Frozen interface: see docs/plan.md §4 and AGENTS.md.
 

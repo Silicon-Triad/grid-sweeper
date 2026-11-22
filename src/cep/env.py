@@ -1,4 +1,6 @@
-"""Environment and schedule loading, grid representation, validation. Owner: Qazi.
+"""Environment and schedule loading, grid representation, validation.
+
+Owner: Muhammad Ahmed Qazi.
 
 Spec §5.2 (Environment Input File):
     "Use the following format, with one item or group of items per line:
